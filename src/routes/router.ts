@@ -1,10 +1,11 @@
-
 import express, { Router } from 'express';
+
+import { login } from '../controller/user';
 
 const router: Router = express.Router();
 
-router.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+//user endpoints
+router.get("/login", login);
+
 
 export default router;
