@@ -1,11 +1,11 @@
 import express, { Router } from 'express';
 
-import { login, register } from '../controller/user';
+import { login, register } from '../controller/userController';
 
 const router: Router = express.Router();
 
 //user endpoints
-router.get("/login", login);
+router.post("/login", login);
 router.post("/register", register);
 
 

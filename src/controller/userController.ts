@@ -6,7 +6,7 @@ import client from "../database/database";
 
 async function login (req:Request,res:Response){
     try {
-        const {username, password} = req.query;
+        const {username, password} = req.query; 
         if (!username || !password) {
             return res.status(400).json({msg: "Please enter all fields"});
         }
@@ -46,6 +46,10 @@ async function register (req:Request, res:Response){
         console.error(err);
         return res.status(500).json({msg: "Internal server error"});
     }
+}
+
+async function verification(req:Request, res:Response){
+    
 }
 
 export {login as login, register as register}
