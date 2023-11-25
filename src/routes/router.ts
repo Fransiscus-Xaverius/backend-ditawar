@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 
 import { login, register, getDataFromToken } from '../controller/userController';
-import { uploadFile, addItem, getItem} from '../controller/itemController';
+import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
 
 const router: Router = express.Router();
 
@@ -14,5 +14,6 @@ router.get("/getDataFromToken", getDataFromToken);
 router.post("/uploadFile", uploadFile);
 router.post("/addItem", addItem);
 router.get("/item", getItem);
+router.get('/image', getImage);
 
 export default router;

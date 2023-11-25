@@ -6,6 +6,7 @@ dotenv.config();
 const jwt = require("jsonwebtoken");
 import client from "../database/database";
 import { ObjectId } from "mongodb";
+import path, { dirname } from "path";
 
 function makeid(length:number) {
     let result = '';
@@ -21,7 +22,7 @@ function makeid(length:number) {
 
 var storage = multer.diskStorage({
         destination: function (req, file, cb) {
-            cb(null, './uploads');
+            cb(null, 'public/images');
         },
         filename: function (req, file, cb) {
             var id =  makeid(10)+Date.now() + '-' + file.originalname;
@@ -45,6 +46,22 @@ async function uploadFile(req: Request, res: Response) {
         
     }
 }
+
+function getImage(req:Request, res:Response):any {
+    try {
+        const filename = req.query.filename!.toString();
+        const imagePath = `C:/Users/Frans/Documents/GitHub/backend-ditawar/public/images/${filename}`;
+        console.log("Image path: ", imagePath); // Log the image path
+        if (fs.existsSync(imagePath)) {
+            res.sendFile(imagePath);
+        } else {
+            console.log("Image not found at path: ", imagePath); // Log the path where the image was not found
+            res.status(404).json({msg: "Image not found"});
+        }
+   } catch (error) {
+        console.error(error);
+   }
+};
 
 async function addItem(req:Request, res:Response){
     const {token, nama, deskripsi, images} = req.query;
@@ -96,6 +113,7 @@ async function getItem(req:Request, res:Response){
         const o_id = new ObjectId(id?.toString() ?? '');
         const result = await client.db("dbDitawar").collection("items").findOne({_id: o_id});
         console.log(result);
+        result.images = result.images;
         return res.status(201).json({msg: "Item Found", result:result});
     } catch (error) {
         console.error(error);
@@ -103,6 +121,6 @@ async function getItem(req:Request, res:Response){
     }
 }
 
-export {uploadFile as uploadFile, addItem as addItem, getItem as getItem};
+export {uploadFile as uploadFile, addItem as addItem, getItem as getItem, getImage as getImage};
 
-module.exports = {uploadFile, addItem, getItem}
+module.exports = {uploadFile, addItem, getItem, getImage}
