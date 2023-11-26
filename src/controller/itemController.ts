@@ -65,10 +65,7 @@ function getImage(req:Request, res:Response):any {
 
 async function addItem(req:Request, res:Response){
     const {token, nama, deskripsi, images} = req.query;
-    const{ tanggal_selesai, jam_selesai } = req.body;
     const cert = process.env.PRIVATE_KEY;
-    console.log(tanggal_selesai);
-    console.log(jam_selesai)
     console.log('hello');
     let decoded:any;
     try {
@@ -82,8 +79,6 @@ async function addItem(req:Request, res:Response){
         deskripsi: deskripsi,
         images: images,
         user_id: user._id,
-        mulai: new Date().toLocaleString(),
-        selesai: new Date(tanggal_selesai+" "+jam_selesai).toLocaleString()
     }
     try {
         await client.connect();
@@ -97,20 +92,13 @@ async function addItem(req:Request, res:Response){
 
 async function getItem(req:Request, res:Response){
     console.log('hello');
-    const {token} = req.query;
     const cert = process.env.PRIVATE_KEY;
     const {id} = req.query;
     console.log(id);
-    let decoded:any;
-    try {
-        decoded = jwt.verify(token, cert);
-    } catch (error) {
-        return res.status(401).json({msg: "Unauthorized"});
-    }
-    const user = decoded.user;
     try {
         await client.connect();
         const o_id = new ObjectId(id?.toString() ?? '');
+        console.log(o_id);
         const result = await client.db("dbDitawar").collection("items").findOne({_id: o_id});
         console.log(result);
         result.images = result.images;
