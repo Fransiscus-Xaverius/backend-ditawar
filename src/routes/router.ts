@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 
 import { login, register, getDataFromToken } from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
-import { addAuction, getAuction } from '../controller/auctionController';
+import { addAuction, getAuction, getAllAuction } from '../controller/auctionController';
 
 const router: Router = express.Router();
 
@@ -20,5 +20,6 @@ router.get('/image', getImage);
 //auction endpoints
 router.post("/auction", addAuction);
 router.get("/auction", getAuction);
+router.get("/allAuction", getAllAuction)
 
 export default router;

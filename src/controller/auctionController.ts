@@ -20,8 +20,8 @@ async function addAuction(req:Request, res:Response){
         id_barang: id_barang,
         starting_price: starting_price,
         asking_price: asking_price,
-        tanggal_mulai: new Date().toLocaleString(),
-        tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai).toLocaleString()
+        tanggal_mulai: new Date(),
+        tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai)
     }
     await client.connect();
     const result = await client.db("dbDitawar").collection("auctions").insertOne(newAuction);
@@ -33,6 +33,19 @@ async function addAuction(req:Request, res:Response){
   } catch (error) {
     console.log(error);
     return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+async function getAllAuction(req:Request, res:Response){
+  const cert = process.env.PRIVATE_KEY;
+  try {
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("auctions").find();
+    console.log(result);
+    return res.status(201).json({msg: "Item Found", result:result});
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({msg: "Internal server error"});
   }
 }
 
@@ -51,5 +64,5 @@ async function getAuction(req:Request, res:Response){
   }
 }
 
-export { addAuction as addAuction , getAuction as getAuction};
-module.exports = { addAuction , getAuction }
+export { addAuction as addAuction , getAuction as getAuction, getAllAuction as getAllAuction};
+module.exports = { addAuction , getAuction, getAllAuction }
