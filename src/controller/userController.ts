@@ -34,6 +34,13 @@ async function login (req:Request,res:Response){
     }
 }
 
+async function allUser(req:Request, res:Response){
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("users").find().toArray();
+    console.log(result);
+    return res.status(200).send({result:result, message:"Berhasil"});
+}
+
 async function getDataFromToken(req:Request, res:Response){
     const {token} = req.query;
     const cert = process.env.PRIVATE_KEY;
@@ -84,8 +91,8 @@ async function verification(req:Request, res:Response){
     
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification}
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser}
 
-module.exports = { login, register , getDataFromToken, verification};
+module.exports = { login, register , getDataFromToken, verification, allUser};
 
 

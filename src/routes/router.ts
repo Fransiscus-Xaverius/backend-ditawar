@@ -1,8 +1,9 @@
 import express, { Router } from 'express';
 
-import { login, register, getDataFromToken } from '../controller/userController';
+import { login, register, getDataFromToken} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
 import { addAuction, getAuction, getAllAuction } from '../controller/auctionController';
+import { allUser } from '../controller/userController';
 
 const router: Router = express.Router();
 
@@ -10,8 +11,9 @@ const router: Router = express.Router();
 router.post("/login", login);
 router.post("/register", register);
 router.get("/getDataFromToken", getDataFromToken);
+router.get('/allUser', allUser);
 
-//item endpoints
+//item 
 router.post("/uploadFile", uploadFile);
 router.post("/addItem", addItem);
 router.get("/item", getItem);
