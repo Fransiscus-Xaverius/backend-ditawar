@@ -14,6 +14,8 @@ async function addAuction(req:Request, res:Response){
         return res.status(401).json({msg: "Unauthorized"});
     }
     const user = decoded.user;
+    console.log(tanggal_selesai)
+    console.log(new Date(tanggal_selesai+" "+jam_selesai))
     const newAuction = {
         id_user: user._id,
         nama_penjual: user.nama,
@@ -32,7 +34,7 @@ async function addAuction(req:Request, res:Response){
     return res.status(500).json({msg: "Internal server error"});
 
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({msg: "Internal server error"});
   }
 }
@@ -41,7 +43,24 @@ async function getAllAuction(req:Request, res:Response){
   const cert = process.env.PRIVATE_KEY;
   try {
     await client.connect();
-    const result = await client.db("dbDitawar").collection("auctions").find();
+    const result = await client.db("dbDitawar").collection("auctions").find().toArray();
+    console.log(result);
+    return res.status(201).json({msg: "Item Found", result:result});
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+async function getSampleAuctions(req:Request, res:Response){
+  try {
+    const filter = [
+      {
+        $sample: { size: 10 }
+      }
+    ]
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("auctions").aggregate(filter).toArray();
     console.log(result);
     return res.status(201).json({msg: "Item Found", result:result});
   } catch (error) {
@@ -53,7 +72,7 @@ async function getAllAuction(req:Request, res:Response){
 async function getAuction(req:Request, res:Response){
   const cert = process.env.PRIVATE_KEY;
   const {id} = req.query;
-  console.log(id);
+  // console.log(id);
   try {
       await client.connect();
       const o_id = new ObjectId(id?.toString() ?? '');
@@ -65,5 +84,5 @@ async function getAuction(req:Request, res:Response){
   }
 }
 
-export { addAuction as addAuction , getAuction as getAuction, getAllAuction as getAllAuction};
-module.exports = { addAuction , getAuction, getAllAuction }
+export { addAuction as addAuction , getAuction as getAuction, getAllAuction as getAllAuction, getSampleAuctions as getSampleAuctions};
+module.exports = { addAuction , getAuction, getAllAuction, getSampleAuctions }

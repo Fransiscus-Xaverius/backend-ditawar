@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 
 import { login, register, getDataFromToken} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
-import { addAuction, getAuction, getAllAuction } from '../controller/auctionController';
+import { addAuction, getAuction, getAllAuction, getSampleAuctions } from '../controller/auctionController';
 import { allUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 
@@ -23,7 +23,8 @@ router.get('/image', getImage);
 //auction endpoints
 router.post("/auction", addAuction);
 router.get("/auction", getAuction);
-router.get("/allAuction", getAllAuction)
+router.get("/allAuction", getAllAuction);
+router.get('/sampleAuction', getSampleAuctions);
 
 //bid endpoints
 router.post("/bid", addBid);
