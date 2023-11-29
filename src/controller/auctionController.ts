@@ -39,15 +39,37 @@ async function addAuction(req:Request, res:Response){
 
 async function getAllAuction(req:Request, res:Response){
   const cert = process.env.PRIVATE_KEY;
-  try {
-    await client.connect();
-    const result = await client.db("dbDitawar").collection("auctions").find();
-    console.log(result);
-    return res.status(201).json({msg: "Item Found", result:result});
-  } catch (error) {
-      console.error(error);
-      return res.status(500).json({msg: "Internal server error"});
-  }
+	try {
+		await client.connect();
+		const result = await client
+			.db("dbDitawar")
+			.collection("auctions")
+			.find()
+			.toArray();
+		for (let i = 0; i < result.length; i++) {
+			const item_id = result[i].id_barang;
+      const o_id = new ObjectId(item_id?.toString() ?? "");
+			const temp_item = await client
+				.db("dbDitawar")
+				.collection("items")
+				.findOne({ _id: o_id });
+			result[i] = {
+        id_user: result[i].id_user,
+        nama_penjual: result[i].nama_penjual,
+        id_barang: result[i].id_barang,
+        starting_price: result[i].starting_price,
+        asking_price: result[i].asking_price,
+        tanggal_mulai: result[i].tanggal_mulai,
+        tanggal_selesai: result[i].tanggal_selesai,
+        item : temp_item
+      }
+		}
+		console.log(result);
+		return res.status(201).json({ msg: "Item Found", result: result });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ msg: "Internal server error" });
+	}
 }
 
 async function getAuction(req:Request, res:Response){
