@@ -2,6 +2,15 @@ import { Request, Response } from "express";
 import client from "../database/database";
 const jwt = require('jsonwebtoken');
 import { ObjectId } from "mongodb";
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://127.0.0.1:27017/dbDitawar');
+
+const itemSchema = new mongoose.Schema({
+  nama: String
+});
+
+const Item = mongoose.model('items', itemSchema);
+
 
 async function addAuction(req:Request, res:Response){
   try {
@@ -84,5 +93,50 @@ async function getAuction(req:Request, res:Response){
   }
 }
 
-export { addAuction as addAuction , getAuction as getAuction, getAllAuction as getAllAuction, getSampleAuctions as getSampleAuctions};
-module.exports = { addAuction , getAuction, getAllAuction, getSampleAuctions }
+async function getAuctionByQuery(req:Request, res:Response){
+  const {query} = req.query;
+  const keyword = query?.toString() ?? '';
+  // console.log(id);
+  try {
+      await client.connect();
+      const items = await client.db("dbDitawar").collection("items").find({nama: {$regex: keyword}}).toArray();
+      let result:any = [];
+      try {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const id = item._id.toString();
+          const auction = await client.db("dbDitawar").collection("auctions").findOne({id_barang: id});
+          console.log(auction);
+          if(auction){
+            let data = {
+              item: item,
+              auction: auction
+            }
+            result.push(data);
+          }
+        }
+      } catch (error) {
+        return res.status(500).json({msg: "Internal server error"});
+      }
+      return res.status(201).json({msg: "Item Found", result:result});
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+export { 
+  addAuction as addAuction , 
+  getAuction as getAuction, 
+  getAllAuction as getAllAuction, 
+  getSampleAuctions as getSampleAuctions, 
+  getAuctionByQuery as getAuctionByQuery
+};
+
+module.exports = { 
+  addAuction , 
+  getAuction, 
+  getAllAuction, 
+  getSampleAuctions, 
+  getAuctionByQuery 
+}
