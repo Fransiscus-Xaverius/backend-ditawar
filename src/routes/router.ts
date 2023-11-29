@@ -4,6 +4,7 @@ import { login, register, getDataFromToken} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
 import { addAuction, getAuction, getAllAuction } from '../controller/auctionController';
 import { allUser } from '../controller/userController';
+import { getBid, addBid } from '../controller/bidController';
 
 const router: Router = express.Router();
 
@@ -23,5 +24,9 @@ router.get('/image', getImage);
 router.post("/auction", addAuction);
 router.get("/auction", getAuction);
 router.get("/allAuction", getAllAuction)
+
+//bid endpoints
+router.post("/bid", addBid);
+router.get("/bid", getBid);
 
 export default router;

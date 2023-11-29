@@ -26,7 +26,10 @@ async function login (req:Request,res:Response){
             nama:user.nama,
             email:user.email,
             phone:user.phone,
-            city:user.city
+            city:user.city,
+            _id:user._id,
+            role:user.role,
+            passwordlength: password.length
         }});
     } catch (err) {
         console.error(err);
@@ -49,6 +52,7 @@ async function getDataFromToken(req:Request, res:Response){
             return res.status(401).json({msg: "Unauthorized"});
         }
         else {
+            console.log(payload);
             return res.status(200).json({msg: "Authorized", payload:payload});
         }
     });
@@ -76,7 +80,8 @@ async function register (req:Request, res:Response){
             password: hashedPassword,
             nama:name,
             phone:phone,
-            city:city
+            city:city,
+            role:"unverified"
         }
         await client.db("dbDitawar").collection("users").insertOne(newUser);
         return res.status(200).json({msg: "User created successfully"});

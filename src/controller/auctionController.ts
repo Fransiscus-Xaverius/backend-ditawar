@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 async function addAuction(req:Request, res:Response){
   try {
-    const {token, id_barang, starting_price, asking_price, tanggal_selesai, jam_selesai } = req.body;
+    const {token, id_barang, starting_price, asking_price, tanggal_selesai, jam_selesai, kategori } = req.body;
     const cert = process.env.PRIVATE_KEY;
     let decoded:any;
     try {
@@ -18,6 +18,7 @@ async function addAuction(req:Request, res:Response){
         id_user: user._id,
         nama_penjual: user.nama,
         id_barang: id_barang,
+        kategori_barang: kategori,
         starting_price: starting_price,
         asking_price: asking_price,
         tanggal_mulai: new Date(),
