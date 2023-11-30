@@ -9,6 +9,8 @@ import { get } from 'http';
 
 const router: Router = express.Router();
 
+//router
+
 //user endpoints
 router.post("/login", login);
 router.post("/register", register);
