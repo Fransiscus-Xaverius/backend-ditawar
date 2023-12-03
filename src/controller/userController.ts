@@ -60,7 +60,7 @@ async function getDataFromToken(req:Request, res:Response){
 
 async function register (req:Request, res:Response){
     try {
-        const { password, phone, email, city, name} = req.query;
+        const { password, phone, email, city, name, province, address} = req.query;
         if (!email || !password) {
             return res.status(400).json({msg: "Please enter all fields"});
         }
@@ -80,7 +80,9 @@ async function register (req:Request, res:Response){
             password: hashedPassword,
             nama:name,
             phone:phone,
+            address:address,
             city:city,
+            province:province,
             role:"unverified"
         }
         await client.db("dbDitawar").collection("users").insertOne(newUser);
@@ -93,7 +95,7 @@ async function register (req:Request, res:Response){
 }
 
 async function topUp(req:Request, res:Response){ //top up wallet
-    
+
 }
 
 async function verification(req:Request, res:Response){

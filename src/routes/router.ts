@@ -5,8 +5,8 @@ import { uploadFile, addItem, getItem, getImage} from '../controller/itemControl
 import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery } from '../controller/auctionController';
 import { allUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
-import { get } from 'http';
 import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
+import { newWallet, getWallet, useSaldo, addSaldo } from '../controller/walletController';
 
 const router: Router = express.Router();
 
@@ -37,6 +37,11 @@ router.post("/expireInvoice", ExpireInvoice);
 router.get("/getInvoicebyInvoice_id", GetInvoicebyInvoice_id);
 router.get("/getInvoicebyExternal_id", GetInvoicebyExternal_id);
 
+//wallet endpoints
+router.post("/wallet", newWallet);
+router.get("/wallet", getWallet);
+router.post('/wallet/add', addSaldo);
+router.post("/wallet/use", useSaldo);
 
 //bid endpoints
 router.post("/bid", addBid);
