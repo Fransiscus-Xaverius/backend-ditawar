@@ -6,6 +6,7 @@ import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQ
 import { allUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 import { get } from 'http';
+import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
 
 const router: Router = express.Router();
 
@@ -29,6 +30,13 @@ router.get("/auction", getAuction);
 router.get("/allAuction", getAllAuction);
 router.get('/sampleAuction', getSampleAuctions);
 router.get('/search', getAuctionByQuery);
+
+//payment endpoints
+router.post("/createInvoice", createInvoice);
+router.post("/expireInvoice", ExpireInvoice);
+router.get("/getInvoicebyInvoice_id", GetInvoicebyInvoice_id);
+router.get("/getInvoicebyExternal_id", GetInvoicebyExternal_id);
+
 
 //bid endpoints
 router.post("/bid", addBid);

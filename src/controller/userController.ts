@@ -92,6 +92,10 @@ async function register (req:Request, res:Response){
     }
 }
 
+async function topUp(req:Request, res:Response){ //top up wallet
+    
+}
+
 async function verification(req:Request, res:Response){
     
 }
