@@ -70,7 +70,7 @@ async function getSampleAuctions(req:Request, res:Response){
     ]
     await client.connect();
     const result = await client.db("dbDitawar").collection("auctions").aggregate(filter).toArray();
-    console.log(result);
+    // console.log(result);
     return res.status(201).json({msg: "Item Found", result:result});
   } catch (error) {
       console.error(error);

@@ -98,9 +98,9 @@ async function getItem(req:Request, res:Response){
     try {
         await client.connect();
         const o_id = new ObjectId(id?.toString() ?? '');
-        console.log(o_id);
+        // console.log(o_id);
         const result = await client.db("dbDitawar").collection("items").findOne({_id: o_id});
-        console.log(result);
+        // console.log(result);
         result.images = result.images;
         return res.status(201).json({msg: "Item Found", result:result});
     } catch (error) {

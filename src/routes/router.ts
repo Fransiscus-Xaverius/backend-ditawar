@@ -6,7 +6,7 @@ import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQ
 import { allUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
-import { newWallet, getWallet, useSaldo, addSaldo } from '../controller/walletController';
+import { getWallet, useSaldo, addSaldo } from '../controller/walletController';
 
 const router: Router = express.Router();
 
@@ -38,7 +38,6 @@ router.get("/getInvoicebyInvoice_id", GetInvoicebyInvoice_id);
 router.get("/getInvoicebyExternal_id", GetInvoicebyExternal_id);
 
 //wallet endpoints
-router.post("/wallet", newWallet);
 router.get("/wallet", getWallet);
 router.post('/wallet/add', addSaldo);
 router.post("/wallet/use", useSaldo);

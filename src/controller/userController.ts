@@ -4,6 +4,7 @@ dotenv.config();
 import client from "../database/database";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+import { newWallet } from "./walletController";
 
 async function login (req:Request,res:Response){
     try {
@@ -86,6 +87,8 @@ async function register (req:Request, res:Response){
             role:"unverified"
         }
         await client.db("dbDitawar").collection("users").insertOne(newUser);
+        const user = await client.db("dbDitawar").collection("users").findOne({email:email});
+        const wallet = await newWallet(user._id, 0);
         return res.status(200).json({msg: "User created successfully"});
     
     } catch (err) {
