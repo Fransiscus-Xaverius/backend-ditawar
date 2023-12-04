@@ -27,8 +27,8 @@ async function createInvoice (req:Request, res:Response) {
                 customer: {
                     given_names: nama,
                     surname: nama,
-                    email: "frans.test.spam@gmail.com",
-                    mobile_number: "087887235981",
+                    email: email,
+                    mobile_number: phone,
                     addresses: [
                         {
                             city: city,

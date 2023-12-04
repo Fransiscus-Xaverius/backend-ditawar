@@ -14,7 +14,7 @@ const Item = mongoose.model('items', itemSchema);
 
 async function addAuction(req:Request, res:Response){
   try {
-    const {token, id_barang, starting_price, asking_price, tanggal_selesai, jam_selesai, kategori } = req.body;
+    const {token, id_barang, starting_price, asking_price, tanggal_selesai, jam_selesai, kategori, kecamatan, kota_kabupaten, provinsi } = req.body;
     const cert = process.env.PRIVATE_KEY;
     let decoded:any;
     try {
@@ -33,6 +33,9 @@ async function addAuction(req:Request, res:Response){
         starting_price: starting_price,
         asking_price: asking_price,
         tanggal_mulai: new Date(),
+        kecamatan: kecamatan,
+        kota_kabupaten: kota_kabupaten,
+        provinsi: provinsi,
         tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai)
     }
     await client.connect();
