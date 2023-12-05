@@ -131,8 +131,45 @@ async function verification(req:Request, res:Response){
     
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById}
+async function updateUserById(req:Request, res:Response) {
+    const {id} = req.query;
+    try {
+        await client.connect();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        if(req.body.password){
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const result = await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{
+                $set : {
+                    nama:req.body.nama,
+                    email:req.body.email,
+                    phone:req.body.phone,
+                    city : req.body.city,
+                    profile_picture : req.body.profile_picture,
+                    password : hashedPassword
+                }
+            });
+        }
+        else {
+            const result = await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{
+                $set : {
+                    nama:req.body.nama,
+                    email:req.body.email,
+                    phone:req.body.phone,
+                    city : req.body.city,
+                    profile_picture : req.body.profile_picture
+                }
+            });
+        }
+        return res.status(201).json({msg: "User Updated"});
+    } catch (error) {
+        console.error("inierror",error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
 
-module.exports = { login, register , getDataFromToken, verification, allUser, getUserById};
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById}
+
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById};
 
 
