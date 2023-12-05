@@ -37,6 +37,7 @@ async function addAuction(req:Request, res:Response){
         provinsi: provinsi,
         tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai),
         highest_bid: null,
+        ended: false
     }
     await client.connect();
     const result = await client.db("dbDitawar").collection("auctions").insertOne(newAuction);
@@ -48,6 +49,61 @@ async function addAuction(req:Request, res:Response){
   } catch (error) {
     // console.log(error);
     return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+async function AuctionUpdate(){
+  try {
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("auctions").find({ended:false}).toArray();
+    const now = new Date();
+    for (let i = 0; i < result.length; i++) {
+      const auction = result[i];
+      const end = new Date(auction.tanggal_selesai);
+      if(now > end){
+        console.log("Found auction to end")
+        await client.db("dbDitawar").collection("auctions").updateOne({_id: new ObjectId(auction._id)}, {$set: {ended: true}});
+        const highestBid = await client.db("dbDitawar").collection("bids").findOne({_id: new ObjectId(auction.highest_bid)});
+        if(highestBid){
+          const item = await Item.findOne({_id: new ObjectId(auction.id_barang)});
+          if(item){
+            const seller = await client.db("dbDitawar").collection("users").findOne({_id: new ObjectId(auction.id_user)});
+            const buyer = await client.db("dbDitawar").collection("users").findOne({_id: new ObjectId(highestBid.id_user)});
+            if(buyer){
+              const wallet = await client.db("dbDitawar").collection("wallets").findOne({id_user: new ObjectId(seller._id)});
+              if(wallet){
+                const saldo = wallet.saldo;
+                const saldo_tertahan = wallet.saldo_tertahan;
+                const history = wallet.history;
+                const newTransaction = {
+                  id_auction: auction._id,
+                  id_item: item._id,
+                  buyer: buyer._id,
+                  type:"auction",
+                  invoice: {
+                    amount: highestBid.bid,
+                    date: new Date(),
+                    status: "pending",
+                    description: "Pembayaran untuk barang "+item.nama+" dengan harga "+highestBid.bid
+                  }
+                }
+                const transaction = await client.db("dbDitawar").collection("transactions").insertOne(newTransaction);
+
+                history.push(transaction.insertedId);
+                const update = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(seller._id)}, {$set: {saldo: saldo, saldo_tertahan: parseInt(saldo_tertahan) + parseInt(highestBid.bid), history: history}});
+                console.log(update);
+              }
+            }
+          }
+        }
+      }
+      // else{
+      //   console.log(now, end);
+      // }
+    }
+
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -79,6 +135,7 @@ async function updateAuction(req:Request, res:Response){
           kota_kabupaten: kota_kabupaten,
           provinsi: provinsi,
           highest_bid: highest_bid,
+
         }
       }
     );
@@ -144,7 +201,7 @@ async function getAuctionByQuery(req:Request, res:Response){
   // console.log(id);
   try {
       await client.connect();
-      const items = await client.db("dbDitawar").collection("items").find({nama: {$regex: keyword}}).toArray();
+      const items = await client.db("dbDitawar").collection("items").find({nama: {$regex: keyword, $options:"i"}}).toArray();
       let result:any = [];
       try {
         for (let i = 0; i < items.length; i++) {
@@ -176,7 +233,8 @@ export {
   getAllAuction as getAllAuction, 
   getSampleAuctions as getSampleAuctions, 
   getAuctionByQuery as getAuctionByQuery,
-  updateAuction as updateAuction
+  updateAuction as updateAuction,
+  AuctionUpdate as AuctionUpdate
 };
 
 module.exports = { 
@@ -185,5 +243,6 @@ module.exports = {
   getAllAuction, 
   getSampleAuctions, 
   getAuctionByQuery,
-  updateAuction 
+  updateAuction,
+  AuctionUpdate 
 }

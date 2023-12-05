@@ -18,6 +18,7 @@ async function addBid(req:Request, res:Response){
         try {
             const user = decoded.user;
             await client.connect();
+            
             const o_id = new ObjectId(idAuction?.toString() ?? '');
             const result = await client.db("dbDitawar").collection("auctions").findOne({_id: o_id});
             if(result){
