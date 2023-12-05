@@ -64,7 +64,6 @@ async function getBid(req:Request, res:Response){
         console.error(error);
         return res.status(500).json({msg: "Internal server error"});
     }
-
 }
 
 export {addBid as addBid, getBid as getBid}

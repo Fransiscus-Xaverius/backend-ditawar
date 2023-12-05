@@ -5,6 +5,7 @@ import client from "../database/database";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 import { newWallet } from "./walletController";
+import { ObjectId } from "mongodb";
 
 async function login (req:Request,res:Response){
     try {
@@ -30,7 +31,8 @@ async function login (req:Request,res:Response){
             city:user.city,
             _id:user._id,
             role:user.role,
-            passwordlength: password.length
+            passwordlength: password.length,
+            profile_picture:user.profile_picture
         }});
     } catch (err) {
         console.error(err);
@@ -84,7 +86,8 @@ async function register (req:Request, res:Response){
             address:address,
             city:city,
             province:province,
-            role:"unverified"
+            role:"unverified",
+            profile_picture:"default_avatar.jpg"
         }
         await client.db("dbDitawar").collection("users").insertOne(newUser);
         const user = await client.db("dbDitawar").collection("users").findOne({email:email});
@@ -97,7 +100,30 @@ async function register (req:Request, res:Response){
     }
 }
 
-async function topUp(req:Request, res:Response){ //top up wallet
+async function getUserById(req:Request, res:Response){
+    const {id} = req.query;
+    try {
+        await client.connect();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        const result = await client.db("dbDitawar").collection("users").findOne({_id: o_id});
+        const userObj = {
+            nama:result.nama,
+            email:result.email,
+            phone:result.phone,
+            address:result.address,
+            city:result.city,
+            province:result.province,
+            _id:result._id,
+            role:result.role
+        }
+        return res.status(201).json({msg: "User Found", result:userObj});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+} 
+
+async function requestVerification(req:Request, res:Response){
 
 }
 
@@ -105,8 +131,8 @@ async function verification(req:Request, res:Response){
     
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser}
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById}
 
-module.exports = { login, register , getDataFromToken, verification, allUser};
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById};
 
 

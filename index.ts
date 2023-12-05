@@ -13,6 +13,10 @@ app.use(cors());
 app.use('/', router);
 app.use('/static', express.static('public/images'))
 
+setInterval(function() {
+    
+}, 1000);
+
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
