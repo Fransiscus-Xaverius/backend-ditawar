@@ -11,7 +11,6 @@ const itemSchema = new mongoose.Schema({
 
 const Item = mongoose.model('items', itemSchema);
 
-
 async function addAuction(req:Request, res:Response){
   try {
     const {token, id_barang, starting_price, asking_price, tanggal_selesai, jam_selesai, kategori, kecamatan, kota_kabupaten, provinsi } = req.body;
@@ -36,7 +35,8 @@ async function addAuction(req:Request, res:Response){
         kecamatan: kecamatan,
         kota_kabupaten: kota_kabupaten,
         provinsi: provinsi,
-        tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai)
+        tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai),
+        highest_bid: null,
     }
     await client.connect();
     const result = await client.db("dbDitawar").collection("auctions").insertOne(newAuction);
@@ -45,6 +45,48 @@ async function addAuction(req:Request, res:Response){
     }
     return res.status(500).json({msg: "Internal server error"});
 
+  } catch (error) {
+    // console.log(error);
+    return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+async function updateAuction(req:Request, res:Response){
+  try {
+    const {token, id_auction, starting_price, asking_price, tanggal_selesai, jam_selesai, kategori, kecamatan, kota_kabupaten, provinsi, highest_bid } = req.body;
+    const cert = process.env.PRIVATE_KEY;
+    let decoded:any;
+    try {
+        decoded = jwt.verify(token, cert);
+    } catch (error) {
+        return res.status(401).json({msg: "Unauthorized"});
+    }
+    const user = decoded.user;
+    console.log(tanggal_selesai)
+    console.log(new Date(tanggal_selesai+" "+jam_selesai))
+
+    await client.connect();
+    const o_id = new ObjectId(id_auction);
+    const result = await client.db("dbDitawar").collection("auctions").updateOne(
+      { _id: o_id },
+      {
+        $set: {
+          starting_price: starting_price,
+          asking_price: asking_price,
+          tanggal_selesai: new Date(tanggal_selesai+" "+jam_selesai),
+          kategori_barang: kategori,
+          kecamatan: kecamatan,
+          kota_kabupaten: kota_kabupaten,
+          provinsi: provinsi,
+          highest_bid: highest_bid,
+        }
+      }
+    );
+    if (result.modifiedCount > 0) {
+      return res.status(200).json({ msg: "Auction updated" });
+    } else {
+      return res.status(404).json({ msg: "Auction not found" });
+    }
   } catch (error) {
     // console.log(error);
     return res.status(500).json({msg: "Internal server error"});
@@ -133,7 +175,8 @@ export {
   getAuction as getAuction, 
   getAllAuction as getAllAuction, 
   getSampleAuctions as getSampleAuctions, 
-  getAuctionByQuery as getAuctionByQuery
+  getAuctionByQuery as getAuctionByQuery,
+  updateAuction as updateAuction
 };
 
 module.exports = { 
@@ -141,5 +184,6 @@ module.exports = {
   getAuction, 
   getAllAuction, 
   getSampleAuctions, 
-  getAuctionByQuery 
+  getAuctionByQuery,
+  updateAuction 
 }
