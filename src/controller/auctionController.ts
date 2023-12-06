@@ -92,6 +92,19 @@ async function AuctionUpdate(){
                 history.push(transaction.insertedId);
                 const update = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(seller._id)}, {$set: {saldo: saldo, saldo_tertahan: parseInt(saldo_tertahan) + parseInt(highestBid.bid), history: history}});
                 console.log(update);
+
+                const newPurchase = {
+                  buyer: buyer._id,
+                  seller: seller._id,
+                  item: item._id,
+                  auction: auction._id,
+                  transaction: transaction.insertedId,
+                  status: "pending",
+                  history:[]
+                }
+
+                const purchase = await client.db("dbDitawar").collection("purchases").insertOne(newPurchase);
+
               }
             }
           }

@@ -7,6 +7,7 @@ import { allUser, getUserById, reloadUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
 import { getWallet, useSaldo, addSaldo } from '../controller/walletController';
+import { getAllPurchase, getPurchase, getAllPurchaseAsBuyer,getAllPurchaseAsSeller, endPurchase } from '../controller/purchaseController';
 
 const router: Router = express.Router();
 
@@ -50,5 +51,12 @@ router.post("/wallet/use", useSaldo);
 //bid endpoints
 router.post("/bid", addBid);
 router.get("/bid", getBid);
+
+//purchase endpoints
+router.get("/allPurchase", getAllPurchase);
+router.get("/purchase", getPurchase);
+router.get("/allPurchaseAsBuyer", getAllPurchaseAsBuyer);
+router.get("/allPurchaseAsSeller", getAllPurchaseAsSeller);
+router.post("/endPurchase", endPurchase);
 
 export default router;
