@@ -40,6 +40,36 @@ async function login (req:Request,res:Response){
     }
 }
 
+async function reloadUser(req:Request, res:Response){
+    try {
+        const {token} = req.query;
+        await client.connect();
+        const cert = process.env.PRIVATE_KEY;
+        let decoded:any;
+        try {
+            decoded = jwt.verify(token, cert);
+        } catch (error) {
+            return res.status(401).json({msg: "Unauthorized"});
+        }
+        const user = decoded.user;
+        const result = await client.db("dbDitawar").collection("users").findOne({_id: new ObjectId(user._id)});
+        console.log("PP:",result.profile_picture)
+        var newToken = jwt.sign({ user:user }, cert, { expiresIn: '30d' });
+        return res.status(200).json({msg: "Login successful", token:newToken, user:{
+            nama:result.nama,
+            email:result.email,
+            phone:result.phone,
+            city:result.city,
+            _id:result._id,
+            role:result.role,
+            profile_picture:result.profile_picture
+        }});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
 async function allUser(req:Request, res:Response){
     await client.connect();
     const result = await client.db("dbDitawar").collection("users").find().toArray();
@@ -55,7 +85,7 @@ async function getDataFromToken(req:Request, res:Response){
             return res.status(401).json({msg: "Unauthorized"});
         }
         else {
-            console.log(payload);
+            console.log("USERDATA:",payload);
             return res.status(200).json({msg: "Authorized", payload:payload});
         }
     });
@@ -168,8 +198,8 @@ async function updateUserById(req:Request, res:Response) {
     }
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById}
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser}
 
-module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById};
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser};
 
 

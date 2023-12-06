@@ -3,7 +3,7 @@ import express, { Router } from 'express';
 import { login, register, getDataFromToken, updateUserById} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
 import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery, updateAuction } from '../controller/auctionController';
-import { allUser, getUserById } from '../controller/userController';
+import { allUser, getUserById, reloadUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
 import { getWallet, useSaldo, addSaldo } from '../controller/walletController';
@@ -18,7 +18,8 @@ router.post("/register", register);
 router.get("/getDataFromToken", getDataFromToken);
 router.get('/allUser', allUser);
 router.get('/user', getUserById);
-router.put('/user',updateUserById)
+router.put('/user',updateUserById);
+router.get('/reload-user', reloadUser);
 
 //item 
 router.post("/uploadFile", uploadFile);
