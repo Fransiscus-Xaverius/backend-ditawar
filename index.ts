@@ -4,6 +4,7 @@ import router from './src/routes/router';
 const cors = require('cors');
 import path from 'path';
 import { AuctionUpdate } from './src/controller/auctionController';
+import { BidUpdate } from './src/controller/bidController';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use('/static', express.static('public/images'))
 
 setInterval(function() {
     AuctionUpdate();
+    BidUpdate();
 }, 1000);
 
 app.listen(port, () => {

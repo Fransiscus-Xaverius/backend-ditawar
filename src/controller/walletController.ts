@@ -10,8 +10,8 @@ async function validateWallet(id:any){
         console.log("validate wallet")
         await client.connect();
         const result = await client.db("dbDitawar").collection("wallets").findOne({id_user: new ObjectId(id?.toString() ?? '')});
-        console.log("------------------")
-        console.log(result)
+        // console.log("------------------")
+        // console.log(result)
         if(result){
             const history = result.history;
             let saldo = result.saldo;
@@ -19,17 +19,17 @@ async function validateWallet(id:any){
 
             for (let i = 0; i < history.length; i++) {
                 const element = history[i];
-                console.log("KONTOL NJING")
-                console.log(element)
+                // console.log("KONTOL NJING")
+                // console.log(element)
                 const transaction = await client.db("dbDitawar").collection("transactions").findOne({_id: element});
-                console.log(transaction)
+                // console.log(transaction)
                 if(transaction){
                     if(transaction.type == "topup" && transaction.invoice.status == "PENDING"){
                         const newStatus = await getInvoiceStatus(new ObjectId(transaction._id));
-                        console.log("KONTOL")
-                        console.log(newStatus)
+                        // console.log("KONTOL")
+                        // console.log(newStatus)
                         if(newStatus == "SETTLED"){
-                            console.log("SETTLED")
+                            // console.log("SETTLED")
                             saldo += transaction.invoice.amount;
                             await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(id?.toString() ?? '')}, {$set: {saldo: saldo}});
                         }
