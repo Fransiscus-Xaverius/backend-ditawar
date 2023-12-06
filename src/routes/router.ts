@@ -58,6 +58,6 @@ router.get("/purchase", getPurchase);
 router.get("/allPurchaseAsBuyer", getAllPurchaseAsBuyer);
 router.get("/allPurchaseAsSeller", getAllPurchaseAsSeller);
 router.post("/endPurchase", endPurchase);
-router.get("/purchase-detail", getPurchaseDetail)
+router.get("/purchase-detail", getPurchaseDetail);
 
 export default router;

@@ -67,9 +67,10 @@ const getAllPurchaseAsSeller = async (req:Request, res:Response) => {
     }
     const user = decoded.user;
     const {_id} = user;
+    console.log("ID:", _id);
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("purchases").find({seller: _id}).toArray();
+        const result = await client.db("dbDitawar").collection("purchases").find({seller: new ObjectId(_id)}).toArray();
         return res.status(201).json({msg: "Purchase Found", result:result});
     } catch (error) {
         console.error(error);
@@ -88,9 +89,10 @@ const getAllPurchaseAsBuyer = async (req:Request, res:Response) => {
     }
     const user = decoded.user;
     const {_id} = user;
+    console.log("ID:", _id);
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("purchases").find({buyer: _id}).toArray();
+        const result = await client.db("dbDitawar").collection("purchases").find({buyer: new ObjectId(_id)}).toArray();
         return res.status(201).json({msg: "Purchase Found", result:result});
     } catch (error) {
         console.error(error);
