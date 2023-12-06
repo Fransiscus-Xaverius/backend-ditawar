@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 
-import { login, register, getDataFromToken, updateUserById} from '../controller/userController';
+import { login, register, getDataFromToken, updateUserById, Reload} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
 import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery, updateAuction } from '../controller/auctionController';
 import { allUser, getUserById, reloadUser } from '../controller/userController';
@@ -20,6 +20,7 @@ router.get('/allUser', allUser);
 router.get('/user', getUserById);
 router.put('/user',updateUserById);
 router.get('/reload-user', reloadUser);
+router.post('/reload', Reload);
 
 //item 
 router.post("/uploadFile", uploadFile);

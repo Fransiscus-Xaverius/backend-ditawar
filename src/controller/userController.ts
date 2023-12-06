@@ -153,6 +153,25 @@ async function getUserById(req:Request, res:Response){
     }
 } 
 
+async function Reload(req:Request,res:Response) {
+    const { id } = req.query;
+    const o_id = new ObjectId(id?.toString() ?? '');
+    await client.connect();
+    const user = await client.db("dbDitawar").collection("users").findOne({_id:o_id});
+    const privateKey = process.env.PRIVATE_KEY;
+    var token = jwt.sign({ user:user }, privateKey, { expiresIn: '30d' });
+    return res.status(200).json({msg: "Login successful", token:token, user:{
+        nama:user.nama,
+        email:user.email,
+        phone:user.phone,
+        city:user.city,
+        _id:user._id,
+        role:user.role,
+        profile_picture:user.profile_picture
+    }});
+}
+
+
 async function requestVerification(req:Request, res:Response){
 
 }
@@ -198,8 +217,8 @@ async function updateUserById(req:Request, res:Response) {
     }
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser}
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload}
 
-module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser};
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser,Reload};
 
 
