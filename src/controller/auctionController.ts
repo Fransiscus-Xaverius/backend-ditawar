@@ -168,6 +168,9 @@ async function getSampleAuctions(req:Request, res:Response){
     const filter = [
       {
         $sample: { size: 10 }
+      },
+      {
+        $match: { ended: false }
       }
     ]
     await client.connect();
@@ -207,7 +210,7 @@ async function getAuctionByQuery(req:Request, res:Response){
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
           const id = item._id.toString();
-          const auction = await client.db("dbDitawar").collection("auctions").findOne({id_barang: id});
+          const auction = await client.db("dbDitawar").collection("auctions").findOne({id_barang: id, ended: false});
           console.log(auction);
           if(auction){
             let data = {
