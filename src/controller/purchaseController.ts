@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import client from '../database/database';
 import { ObjectId } from 'mongodb';
+import dotenv from 'dotenv';
+dotenv.config();
+const jwt = require("jsonwebtoken");
 
 const getAllPurchase = async (req:Request, res:Response) => {
     try {
@@ -26,11 +29,47 @@ const getPurchase = async (req:Request, res:Response) => {
     }
 }
 
-const getAllPurchaseAsSeller = async (req:Request, res:Response) => {
+const getPurchaseDetail = async (req:Request, res:Response) => {
     const {id} = req.query;
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("purchases").find({seller: id}).toArray();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        const result = await client.db("dbDitawar").collection("purchases").findOne({_id: o_id});
+        const buyer = await client.db("dbDitawar").collection("users").findOne({_id: result.buyer});
+        const seller = await client.db("dbDitawar").collection("users").findOne({_id: result.seller});
+        const item = await client.db("dbDitawar").collection("items").findOne({_id: result.item});
+        const auction = await client.db("dbDitawar").collection("auctions").findOne({_id: result.auction});
+        const transaction = await client.db("dbDitawar").collection("transactions").findOne({_id: result.transaction});
+        const purchaseObj = {
+            _id: result._id,
+            buyer: buyer,
+            seller: seller,
+            item: item,
+            auction: auction,
+            transaction: transaction,
+            ended: result.ended
+        }
+        return res.status(201).json({msg: "Purchase Detail Found", result:purchaseObj});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
+const getAllPurchaseAsSeller = async (req:Request, res:Response) => {
+    const {token} = req.query;
+    const cert = process.env.PRIVATE_KEY;
+    let decoded:any;
+    try {
+        decoded = jwt.verify(token, cert);
+    } catch (error) {
+        return res.status(401).json({msg: "Unauthorized"});
+    }
+    const user = decoded.user;
+    const {_id} = user;
+    try {
+        await client.connect();
+        const result = await client.db("dbDitawar").collection("purchases").find({seller: _id}).toArray();
         return res.status(201).json({msg: "Purchase Found", result:result});
     } catch (error) {
         console.error(error);
@@ -39,10 +78,19 @@ const getAllPurchaseAsSeller = async (req:Request, res:Response) => {
 }
 
 const getAllPurchaseAsBuyer = async (req:Request, res:Response) => {
-    const {id} = req.query;
+    const {token} = req.query;
+    const cert = process.env.PRIVATE_KEY;
+    let decoded:any;
+    try {
+        decoded = jwt.verify(token, cert);
+    } catch (error) {
+        return res.status(401).json({msg: "Unauthorized"});
+    }
+    const user = decoded.user;
+    const {_id} = user;
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("purchases").find({buyer: id}).toArray();
+        const result = await client.db("dbDitawar").collection("purchases").find({buyer: _id}).toArray();
         return res.status(201).json({msg: "Purchase Found", result:result});
     } catch (error) {
         console.error(error);
@@ -76,7 +124,8 @@ export {
     getPurchase as getPurchase,
     getAllPurchaseAsSeller as getAllPurchaseAsSeller,
     getAllPurchaseAsBuyer as getAllPurchaseAsBuyer,
-    endPurchase as endPurchase
+    endPurchase as endPurchase,
+    getPurchaseDetail as getPurchaseDetail
 }
 
-module.exports = { getAllPurchase, getPurchase, getAllPurchaseAsSeller, getAllPurchaseAsBuyer, endPurchase };
+module.exports = { getAllPurchase, getPurchase, getAllPurchaseAsSeller, getAllPurchaseAsBuyer, endPurchase, getPurchaseDetail };
