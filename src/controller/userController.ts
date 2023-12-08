@@ -177,7 +177,83 @@ async function requestVerification(req:Request, res:Response){
 }
 
 async function verification(req:Request, res:Response){
-    
+    const {id} = req.query;
+    try {
+        await client.connect();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        const result = await client.db("dbDitawar").collection("users").findOne({_id: o_id});
+        if(result.role == "unverified"){
+            await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{$set:{role:"verified"}});
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'a08690751@gmail.com',
+                    pass: 'jyja uwei omtf fyfv',
+                },
+                });
+            const mailOptions = {
+                from: 'a08690751@gmail.com',
+                to: result.email,
+                subject: 'Verified Account',
+                text: 'Hello, Your account has been verified.',
+            };
+
+            await transporter.sendMail(mailOptions)
+        }
+        return res.status(201).json({msg: "User Verified"});
+    } catch (error) {
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
+const nodemailer = require('nodemailer');
+
+async function banned(req:Request, res:Response){
+    const {id} = req.query;
+    try {
+        await client.connect();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        const result = await client.db("dbDitawar").collection("users").findOne({_id: o_id});
+        if(result.role == "banned"){
+            await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{$set:{role:"verified"}});
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'a08690751@gmail.com',
+                    pass: 'jyja uwei omtf fyfv',
+                },
+                });
+            const mailOptions = {
+                from: 'a08690751@gmail.com',
+                to: result.email,
+                subject: 'Unbanned Account',
+                text: 'Hello, Your account has been unbanned.',
+            };
+
+            await transporter.sendMail(mailOptions)
+        }
+        else{
+            await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{$set:{role:"banned"}});
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'a08690751@gmail.com',
+                    pass: 'jyja uwei omtf fyfv',
+                },
+                });
+            const mailOptions = {
+                from: 'a08690751@gmail.com',
+                to: result.email,
+                subject: 'Banned Account',
+                text: 'Hello, Your account has been banned.',
+            };
+
+            await transporter.sendMail(mailOptions)
+        }
+        return res.status(201).json({msg: "User Update"});
+    } catch (error) {
+        return res.status(500).json({msg: "Internal server error"});
+    }
 }
 
 async function updateUserById(req:Request, res:Response) {
@@ -212,13 +288,12 @@ async function updateUserById(req:Request, res:Response) {
         }
         return res.status(201).json({msg: "User Updated"});
     } catch (error) {
-        console.error("inierror",error);
         return res.status(500).json({msg: "Internal server error"});
     }
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload}
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload, banned as banned}
 
-module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser,Reload};
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser,Reload, banned};
 
 

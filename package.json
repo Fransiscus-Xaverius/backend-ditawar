@@ -23,6 +23,7 @@
     "mongodb": "^6.2.0",
     "mongoose": "^8.0.2",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
     "xendit-node": "^4.0.0"
   },
   "devDependencies": {
