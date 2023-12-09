@@ -40,6 +40,24 @@ async function login (req:Request,res:Response){
     }
 }
 
+async function Reload(req:Request,res:Response) {
+    const { id } = req.query;
+    const o_id = new ObjectId(id?.toString() ?? '');
+    await client.connect();
+    const user = await client.db("dbDitawar").collection("users").findOne({_id:o_id});
+    const privateKey = process.env.PRIVATE_KEY;
+    var token = jwt.sign({ user:user }, privateKey, { expiresIn: '30d' });
+    return res.status(200).json({msg: "Login successful", token:token, user:{
+        nama:user.nama,
+        email:user.email,
+        phone:user.phone,
+        city:user.city,
+        _id:user._id,
+        role:user.role,
+        profile_picture:user.profile_picture
+    }});
+}
+
 async function reloadUser(req:Request, res:Response){
     try {
         const {token} = req.query;
@@ -153,23 +171,7 @@ async function getUserById(req:Request, res:Response){
     }
 } 
 
-async function Reload(req:Request,res:Response) {
-    const { id } = req.query;
-    const o_id = new ObjectId(id?.toString() ?? '');
-    await client.connect();
-    const user = await client.db("dbDitawar").collection("users").findOne({_id:o_id});
-    const privateKey = process.env.PRIVATE_KEY;
-    var token = jwt.sign({ user:user }, privateKey, { expiresIn: '30d' });
-    return res.status(200).json({msg: "Login successful", token:token, user:{
-        nama:user.nama,
-        email:user.email,
-        phone:user.phone,
-        city:user.city,
-        _id:user._id,
-        role:user.role,
-        profile_picture:user.profile_picture
-    }});
-}
+
 
 
 async function requestVerification(req:Request, res:Response){
