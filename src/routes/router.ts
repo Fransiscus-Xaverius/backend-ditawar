@@ -1,13 +1,48 @@
-import express, { Router } from 'express';
+import express, { Router } from "express";
 
-import { login, register, getDataFromToken, updateUserById, Reload, verification, banned} from '../controller/userController';
-import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
-import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery, updateAuction, stopAuction, warningAuction } from '../controller/auctionController';
-import { allUser, getUserById, reloadUser } from '../controller/userController';
-import { getBid, addBid } from '../controller/bidController';
-import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
-import { getWallet, useSaldo, addSaldo } from '../controller/walletController';
-import { getAllPurchase, getPurchase, getAllPurchaseAsBuyer,getAllPurchaseAsSeller, endPurchase, getPurchaseDetail } from '../controller/purchaseController';
+import {
+  login,
+  register,
+  getDataFromToken,
+  updateUserById,
+  Reload,
+  verification,
+  banned,
+} from "../controller/userController";
+import {
+  uploadFile,
+  addItem,
+  getItem,
+  getImage,
+} from "../controller/itemController";
+import {
+  addAuction,
+  getAuction,
+  getAllAuction,
+  getSampleAuctions,
+  getAuctionByQuery,
+  updateAuction,
+  stopAuction,
+  warningAuction,
+  buyNowHandler,
+} from "../controller/auctionController";
+import { allUser, getUserById, reloadUser } from "../controller/userController";
+import { getBid, addBid } from "../controller/bidController";
+import {
+  createInvoice,
+  ExpireInvoice,
+  GetInvoicebyInvoice_id,
+  GetInvoicebyExternal_id,
+} from "../controller/paymentController";
+import { getWallet, useSaldo, addSaldo } from "../controller/walletController";
+import {
+  getAllPurchase,
+  getPurchase,
+  getAllPurchaseAsBuyer,
+  getAllPurchaseAsSeller,
+  endPurchase,
+  getPurchaseDetail,
+} from "../controller/purchaseController";
 
 const router: Router = express.Router();
 
@@ -17,29 +52,30 @@ const router: Router = express.Router();
 router.post("/login", login);
 router.post("/register", register);
 router.get("/getDataFromToken", getDataFromToken);
-router.get('/allUser', allUser);
-router.get('/user', getUserById);
-router.put('/user',updateUserById);
-router.get('/reload-user', reloadUser);
-router.post('/reload', Reload);
-router.put('/verification', verification);
-router.put('/banned', banned);
+router.get("/allUser", allUser);
+router.get("/user", getUserById);
+router.put("/user", updateUserById);
+router.get("/reload-user", reloadUser);
+router.post("/reload", Reload);
+router.put("/verification", verification);
+router.put("/banned", banned);
 
-//item 
+//item
 router.post("/uploadFile", uploadFile);
 router.post("/addItem", addItem);
 router.get("/item", getItem);
-router.get('/image', getImage);
+router.get("/image", getImage);
 
 //auction endpoints
 router.post("/auction", addAuction);
 router.get("/auction", getAuction);
-router.put('/auction', updateAuction);
+router.put("/auction", updateAuction);
 router.get("/allAuction", getAllAuction);
-router.get('/sampleAuction', getSampleAuctions);
-router.get('/search', getAuctionByQuery);
-router.put('/stopAuction', stopAuction);
-router.post('/warningAuction', warningAuction)
+router.get("/sampleAuction", getSampleAuctions);
+router.get("/search", getAuctionByQuery);
+router.put("/stopAuction", stopAuction);
+router.post("/warningAuction", warningAuction);
+router.post("/buy-now", buyNowHandler);
 
 //payment endpoints
 router.post("/createInvoice", createInvoice);
@@ -49,7 +85,7 @@ router.get("/getInvoicebyExternal_id", GetInvoicebyExternal_id);
 
 //wallet endpoints
 router.get("/wallet", getWallet);
-router.post('/wallet/add', addSaldo);
+router.post("/wallet/add", addSaldo);
 router.post("/wallet/use", useSaldo);
 
 //bid endpoints
