@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 import { ObjectId } from "mongodb";
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://127.0.0.1:27017/dbDitawar');
+const nodemailer = require('nodemailer');
+
 
 const itemSchema = new mongoose.Schema({
   nama: String
@@ -243,6 +245,48 @@ async function getAuctionByQuery(req:Request, res:Response){
   }
 }
 
+async function stopAuction(req:Request, res:Response){
+  try {
+    const {id} = req.query;
+    const o_id = new ObjectId(id?.toString() ?? '');
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$set: {ended: true}});
+    return res.status(201).json({msg: "Auction ended", result:result});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+async function warningAuction(req:Request, res:Response){
+  try {
+    const {id_user} = req.query;
+    const o_id = new ObjectId(id_user?.toString() ?? '');
+    await client.connect();
+    const result = await client.db("dbDitawar").collection("users").findOne({_id: o_id});
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+          user: 'a08690751@gmail.com',
+          pass: 'jyja uwei omtf fyfv',
+      },
+      });
+  const mailOptions = {
+      from: 'a08690751@gmail.com',
+      to: result.email,
+      subject: 'Warning Auction',
+      text: 'Attention, This message is a warning for your auction.',
+  };
+
+  await transporter.sendMail(mailOptions)
+    return res.status(201).json({msg: "Auction warning", result:result});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({msg: "Internal server error"});
+  }
+}
+
+
 export { 
   addAuction as addAuction , 
   getAuction as getAuction, 
@@ -250,7 +294,9 @@ export {
   getSampleAuctions as getSampleAuctions, 
   getAuctionByQuery as getAuctionByQuery,
   updateAuction as updateAuction,
-  AuctionUpdate as AuctionUpdate
+  AuctionUpdate as AuctionUpdate,
+  stopAuction as stopAuction,
+  warningAuction as warningAuction
 };
 
 module.exports = { 
@@ -260,5 +306,7 @@ module.exports = {
   getSampleAuctions, 
   getAuctionByQuery,
   updateAuction,
-  AuctionUpdate 
+  AuctionUpdate,
+  stopAuction,
+  warningAuction
 }

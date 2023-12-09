@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 import { newWallet } from "./walletController";
 import { ObjectId } from "mongodb";
+const nodemailer = require('nodemailer');
 
 async function login (req:Request,res:Response){
     try {
@@ -207,8 +208,6 @@ async function verification(req:Request, res:Response){
         return res.status(500).json({msg: "Internal server error"});
     }
 }
-
-const nodemailer = require('nodemailer');
 
 async function banned(req:Request, res:Response){
     const {id} = req.query;

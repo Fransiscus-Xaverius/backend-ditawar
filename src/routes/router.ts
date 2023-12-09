@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 
 import { login, register, getDataFromToken, updateUserById, Reload, verification, banned} from '../controller/userController';
 import { uploadFile, addItem, getItem, getImage} from '../controller/itemController';
-import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery, updateAuction } from '../controller/auctionController';
+import { addAuction, getAuction, getAllAuction, getSampleAuctions, getAuctionByQuery, updateAuction, stopAuction, warningAuction } from '../controller/auctionController';
 import { allUser, getUserById, reloadUser } from '../controller/userController';
 import { getBid, addBid } from '../controller/bidController';
 import { createInvoice, ExpireInvoice, GetInvoicebyInvoice_id, GetInvoicebyExternal_id } from '../controller/paymentController';
@@ -38,6 +38,8 @@ router.put('/auction', updateAuction);
 router.get("/allAuction", getAllAuction);
 router.get('/sampleAuction', getSampleAuctions);
 router.get('/search', getAuctionByQuery);
+router.put('/stopAuction', stopAuction);
+router.post('/warningAuction', warningAuction)
 
 //payment endpoints
 router.post("/createInvoice", createInvoice);
