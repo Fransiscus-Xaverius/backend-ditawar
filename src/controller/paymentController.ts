@@ -217,13 +217,25 @@ const GetAllInvoice = async (req:Request, res:Response) => {
     }
 };
 
+const GetAllTransactions = async (req:Request, res:Response) => {
+    try {
+        await client.connect();
+        const transactions = await client.db("dbDitawar").collection("transactions").find().toArray();
+        return res.status(200).send(transactions);
+    } catch (error) {
+        return res.status(500).send("Internal Server Error");
+    }
+};
+
 export {
     createInvoice as createInvoice, 
     ExpireInvoice as ExpireInvoice, 
     GetInvoicebyInvoice_id as GetInvoicebyInvoice_id, 
     GetInvoicebyExternal_id as GetInvoicebyExternal_id, 
     GetAllInvoice as GetAllInvoice, 
-    getInvoiceStatus as getInvoiceStatus}
+    getInvoiceStatus as getInvoiceStatus,
+    GetAllTransactions as GetAllTransactions
+}
 
 module.exports = { 
     createInvoice, 
@@ -231,5 +243,6 @@ module.exports = {
     GetInvoicebyInvoice_id, 
     GetInvoicebyExternal_id, 
     GetAllInvoice, 
-    getInvoiceStatus 
+    getInvoiceStatus,
+    GetAllTransactions
 };

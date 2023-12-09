@@ -33,6 +33,7 @@ import {
   ExpireInvoice,
   GetInvoicebyInvoice_id,
   GetInvoicebyExternal_id,
+  GetAllTransactions,
 } from "../controller/paymentController";
 import { getWallet, useSaldo, addSaldo } from "../controller/walletController";
 import {
@@ -82,6 +83,7 @@ router.post("/createInvoice", createInvoice);
 router.post("/expireInvoice", ExpireInvoice);
 router.get("/getInvoicebyInvoice_id", GetInvoicebyInvoice_id);
 router.get("/getInvoicebyExternal_id", GetInvoicebyExternal_id);
+router.get("/allTransactions", GetAllTransactions);
 
 //wallet endpoints
 router.get("/wallet", getWallet);

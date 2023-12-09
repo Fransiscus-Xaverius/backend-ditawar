@@ -29,7 +29,7 @@ async function addAuction(req: Request, res: Response) {
     const cert = process.env.PRIVATE_KEY;
     let decoded: any;
     try {
-      decoded = jwt.verify("token", cert);
+      decoded = jwt.verify(token, cert);
     } catch (error) {
       return res.status(401).json({ msg: "Unauthorized" });
     }
