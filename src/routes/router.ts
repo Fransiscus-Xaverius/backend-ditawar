@@ -45,6 +45,10 @@ import {
   getPurchaseDetail,
 } from "../controller/purchaseController";
 
+
+import {
+    getTransaction
+} from "../controller/transactionController";
 const router: Router = express.Router();
 
 //router
@@ -101,5 +105,8 @@ router.get("/allPurchaseAsBuyer", getAllPurchaseAsBuyer);
 router.get("/allPurchaseAsSeller", getAllPurchaseAsSeller);
 router.post("/endPurchase", endPurchase);
 router.get("/purchase-detail", getPurchaseDetail);
+
+//transaction endpoints
+router.get('/transaction', getTransaction);
 
 export default router;
