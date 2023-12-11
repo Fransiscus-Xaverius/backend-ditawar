@@ -43,11 +43,12 @@ import {
   getAllPurchaseAsSeller,
   endPurchase,
   getPurchaseDetail,
+  markFinished
 } from "../controller/purchaseController";
 
 
 import {
-    getTransaction
+    getTransaction,
 } from "../controller/transactionController";
 const router: Router = express.Router();
 
@@ -103,10 +104,12 @@ router.get("/allPurchase", getAllPurchase);
 router.get("/purchase", getPurchase);
 router.get("/allPurchaseAsBuyer", getAllPurchaseAsBuyer);
 router.get("/allPurchaseAsSeller", getAllPurchaseAsSeller);
-router.post("/endPurchase", endPurchase);
-router.get("/purchase-detail", getPurchaseDetail);
+router.post("/endPurchase", endPurchase); //end purchase by buyer (this is not the same as mark finished, this endpoint marks that the user has received the item)
+router.get("/purchase-detail", getPurchaseDetail); //get purchase detail by purchase id
+router.post('/purchase/finish', markFinished); //mark purchase as finished by seller (this marks that the seller has sent the item)
 
 //transaction endpoints
 router.get('/transaction', getTransaction);
+
 
 export default router;
