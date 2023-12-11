@@ -145,10 +145,10 @@ async function markFinished(req:Request, res:Response){
                     message:"purchase marked as finished by seller",
                     date: new Date(),
                     time: new Date().getTime(),
-                    type: "mark_finished"
+                    type: "marked"
                 } } }
             );
-            return res.status(201).json({msg: "purchase updated", result: result});
+            return res.status(201).json({msg: "purchase marked as finished", result: result});
         } catch (error) {
             console.error(error);
             return res.status(500).json({msg: "Internal server error"});
