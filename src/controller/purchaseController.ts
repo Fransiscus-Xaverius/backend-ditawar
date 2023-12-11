@@ -130,4 +130,11 @@ export {
     getPurchaseDetail as getPurchaseDetail
 }
 
-module.exports = { getAllPurchase, getPurchase, getAllPurchaseAsSeller, getAllPurchaseAsBuyer, endPurchase, getPurchaseDetail };
+module.exports = { 
+    getAllPurchase, 
+    getPurchase, 
+    getAllPurchaseAsSeller, 
+    getAllPurchaseAsBuyer,
+    endPurchase, 
+    getPurchaseDetail 
+};

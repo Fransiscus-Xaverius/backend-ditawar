@@ -6,12 +6,6 @@ var mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/dbDitawar");
 const nodemailer = require("nodemailer");
 
-const itemSchema = new mongoose.Schema({
-  nama: String,
-});
-
-const Item = mongoose.model("items", itemSchema);
-
 async function addAuction(req: Request, res: Response) {
   try {
     const {
@@ -92,9 +86,7 @@ async function AuctionUpdate() {
           .collection("bids")
           .findOne({ _id: new ObjectId(auction.highest_bid) });
         if (highestBid) {
-          const item = await Item.findOne({
-            _id: new ObjectId(auction.id_barang),
-          });
+          const item = await client.db("dbDitawar").collection("items").findOne({_id: new ObjectId(auction.id_barang)});
           if (item) {
             const seller = await client
               .db("dbDitawar")
