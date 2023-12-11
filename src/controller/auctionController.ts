@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import client from "../database/database";
 const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
-var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/dbDitawar");
 const nodemailer = require("nodemailer");
 
 async function addAuction(req: Request, res: Response) {
