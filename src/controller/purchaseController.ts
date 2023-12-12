@@ -159,6 +159,63 @@ async function markFinished(req:Request, res:Response){
     }
 }
 
+const finishPurchase = async (req:Request, res:Response) => {
+    const id = req.query.id;
+    const {token} = req.body;
+    if(!id){
+        return res.status(400).json({msg: "Bad request (No id)"});
+    }
+    if(!token){
+        return res.status(400).json({msg: "Bad request (No token)"});
+    }
+    try {
+        //cek token
+        const cert = process.env.PRIVATE_KEY;
+        let decoded:any;
+        try {
+            decoded = jwt.verify(token!.toString(), cert);
+        } catch (error) {
+            return res.status(401).json({msg: "Unauthorized"});
+        }
+
+        try{
+            await client.connect();
+            const purchase = await client.db("dbDitawar").collection("purchases").findOne({_id: new ObjectId(id.toString())});
+            if(!purchase){
+                return res.status(404).json({msg: "purchase not found"});
+            }
+            const user = decoded.user;
+            if(purchase.buyer != user._id){
+                return res.status(401).json({msg: "Unauthorized"});
+            }
+        }
+        catch(error){
+            console.error(error);
+            return res.status(500).json({msg: "Internal server error"});
+        }
+
+        try {
+            await client.connect();
+            const result = await client.db("dbDitawar").collection("purchases").updateOne(
+                { _id: new ObjectId(id.toString()) },
+                { $push: { history: {
+                    message:"purchase marked as finished by buyer",
+                    date: new Date(),
+                    time: new Date().getTime(),
+                    type: "finished"
+                } } }
+            );
+            return res.status(201).json({msg: "purchase marked as finished", result: result});
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({msg: "Internal server error"});
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
 const endPurchase = async (req:Request, res:Response) => {
     const {id} = req.query;
     const {user_id} = req.query; 
@@ -187,7 +244,8 @@ export {
     getAllPurchaseAsBuyer as getAllPurchaseAsBuyer,
     endPurchase as endPurchase,
     getPurchaseDetail as getPurchaseDetail,
-    markFinished as markFinished
+    markFinished as markFinished,
+    finishPurchase as finishPurchase
 }
 
 module.exports = { 
@@ -197,5 +255,6 @@ module.exports = {
     getAllPurchaseAsBuyer,
     endPurchase, 
     getPurchaseDetail,
-    markFinished
+    markFinished,
+    finishPurchase
 };

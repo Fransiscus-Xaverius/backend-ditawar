@@ -40,6 +40,5 @@ async function getTransaction(req:Request, res:Response){;
     }
 }
 
-
 export {getTransaction as getTransaction};
 module.exports = {getTransaction};

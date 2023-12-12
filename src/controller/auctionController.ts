@@ -107,6 +107,7 @@ async function AuctionUpdate() {
                   id_auction: auction._id,
                   id_item: item._id,
                   buyer: buyer._id,
+                  seller: seller._id,
                   type: "auction",
                   invoice: {
                     amount: highestBid.bid,
