@@ -248,7 +248,7 @@ async function getSampleAuctions(req: Request, res: Response) {
   try {
     const filter = [
       {
-        $sample: { size: 10 },
+        $sample: { size: 20 },
       },
       {
         $match: { ended: false },
