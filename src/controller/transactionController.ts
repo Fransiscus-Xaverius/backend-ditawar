@@ -57,7 +57,13 @@ const finalizeTransaction = async (id:string, user:string) => {
         return null;
     }
 }
+async function getTransactionbyId(req:Request, res:Response) {
+    const {id} = req.query;
+    await client.connect();
+    const o_id = new ObjectId(id?.toString() ?? '');
+    const result = await client.db("dbDitawar").collection("transactions").findOne({_id: new ObjectId(o_id)});
+    return res.status(200).json({msg: "Transaction Found", result:result});
+} 
 
-
-export {getTransaction as getTransaction};
-module.exports = {getTransaction};
+export {getTransaction as getTransaction, getTransactionbyId as getTransactionbyId};
+module.exports = {getTransaction,getTransactionbyId};

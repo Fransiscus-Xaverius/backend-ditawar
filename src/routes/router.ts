@@ -51,7 +51,7 @@ import {
 
 
 import {
-    getTransaction,
+    getTransaction, getTransactionbyId,
 } from "../controller/transactionController";
 const router: Router = express.Router();
 
@@ -117,6 +117,7 @@ router.post('/purchase/update', updatePurchase);
 
 //transaction endpoints
 router.get('/transaction', getTransaction);
+router.get('/transaction-id', getTransactionbyId)
 
 
 export default router;
