@@ -28,7 +28,7 @@ import {
   buyNowHandler,
 } from "../controller/auctionController";
 import { allUser, getUserById, reloadUser } from "../controller/userController";
-import { getBid, addBid, HighBid } from "../controller/bidController";
+import { getBid, addBid, HighBid, getAllBid } from "../controller/bidController";
 import {
   createInvoice,
   ExpireInvoice,
@@ -103,6 +103,7 @@ router.post("/wallet/use", useSaldo);
 router.post("/bid", addBid);
 router.get("/bid", getBid);
 router.get("/highBid",HighBid );
+router.get("/allBid", getAllBid);
 
 //purchase endpoints
 router.get("/allPurchase", getAllPurchase);
