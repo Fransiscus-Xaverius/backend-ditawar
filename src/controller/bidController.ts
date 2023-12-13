@@ -117,6 +117,22 @@ async function getBid(req:Request, res:Response){
     }
 }
 
+async function HighBid(req:Request, res:Response){
+    const {id} = req.query;
+    console.log(id);
+    try {
+        await client.connect();
+        const o_id = new ObjectId(id?.toString() ?? '');
+        const result = await client.db("dbDitawar").collection("bids").findOne({id_auction : o_id, highest: true})
+        return res.status(201).json({msg: "Item Found", result:result});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+    
+}
+
+
 async function BidUpdate(){
     try {
         await client.connect();
@@ -148,6 +164,6 @@ async function BidUpdate(){
     }
 }
 
-export {addBid as addBid, getBid as getBid,  BidUpdate as BidUpdate}
+export {addBid as addBid, getBid as getBid,  BidUpdate as BidUpdate, HighBid as HighBid}
 
-module.exports = { addBid, getBid, BidUpdate };
+module.exports = { addBid, getBid, BidUpdate, HighBid };
