@@ -36,6 +36,25 @@ async function addBid(req:Request, res:Response){
                     const resultt = await client.db("dbDitawar").collection("bids").insertOne({id_auction: o_id, id_user: user._id, bid: bid, highest: true, returned: false});
                     // console.log(resultt.insertedId);
                     const update = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$set: {highest_bid: resultt.insertedId, highest_bidder: user._id}});
+                    const newHistory = {
+                        wallet_id: wallet!._id,
+                        type: "bid",
+                        invoice: {
+                            auction_id: o_id,
+                            bid_id: resultt.insertedId,
+                            amount: bid,
+                            date: new Date(),
+                        }
+                    }
+                    const newSaldo = parseInt(saldo) - parseInt(bid);
+                    const newSaldoTertahan = parseInt(wallet!.saldo_tertahan) + parseInt(bid);
+                    const updateHistory = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$push: {history: newHistory}});
+                    const updateSaldo = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$set: {saldo: newSaldo, saldo_tertahan: newSaldoTertahan}});
+                    console.log("----------")
+                    console.log("user:",user._id)
+                    console.log("new saldo:",newSaldo);
+                    console.log("saldo tertahan:",newSaldoTertahan);
+                    console.log("saldo update:",updateSaldo);
                     return res.status(201).json({msg: "Bid added", result:resultt});
                 }
                 else{

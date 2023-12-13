@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 dotenv.config();
 const jwt = require("jsonwebtoken");
+import { finalizeTransaction } from './transactionController';
 
 const getAllPurchase = async (req:Request, res:Response) => {
     try {
@@ -178,10 +179,10 @@ const finishPurchase = async (req:Request, res:Response) => {
         } catch (error) {
             return res.status(401).json({msg: "Unauthorized"});
         }
-
+        let purchase = null;
         try{
             await client.connect();
-            const purchase = await client.db("dbDitawar").collection("purchases").findOne({_id: new ObjectId(id.toString())});
+            purchase = await client.db("dbDitawar").collection("purchases").findOne({_id: new ObjectId(id.toString())});
             if(!purchase){
                 return res.status(404).json({msg: "purchase not found"});
             }
@@ -211,7 +212,13 @@ const finishPurchase = async (req:Request, res:Response) => {
                 { $set: { status: "finished" } }
             );
             
-            return res.status(201).json({msg: "purchase marked as finished", result: result});
+            const tryFinalize = await finalizeTransaction(purchase.transaction, decoded.user._id);
+
+            if(!tryFinalize){
+                return res.status(500).json({msg: "Internal server error"});
+            }
+
+            return res.status(201).json({msg: "purchase set as finished", result: result});
         } catch (error) {
             console.error(error);
             return res.status(500).json({msg: "Internal server error"});
