@@ -184,9 +184,10 @@ async function updateAuction(req: Request, res: Response) {
       kota_kabupaten,
       provinsi,
       highest_bid,
-    } = req.body;
+    } = req.query;
     const cert = process.env.PRIVATE_KEY;
     let decoded: any;
+    console.log(id_auction)
     try {
       decoded = jwt.verify(token, cert);
     } catch (error) {
@@ -197,7 +198,7 @@ async function updateAuction(req: Request, res: Response) {
     console.log(new Date(tanggal_selesai + " " + jam_selesai));
 
     await client.connect();
-    const o_id = new ObjectId(id_auction);
+    const o_id = new ObjectId(id_auction?.toString());
     const result = await client
       .db("dbDitawar")
       .collection("auctions")

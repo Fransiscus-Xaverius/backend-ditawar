@@ -14,6 +14,7 @@ import {
   addItem,
   getItem,
   getImage,
+  editItem,
 } from "../controller/itemController";
 import {
   addAuction,
@@ -70,6 +71,7 @@ router.put("/banned", banned);
 //item
 router.post("/uploadFile", uploadFile);
 router.post("/addItem", addItem);
+router.put("/editItem", editItem);
 router.get("/item", getItem);
 router.get("/image", getImage);
 

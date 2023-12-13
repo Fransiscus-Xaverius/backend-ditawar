@@ -90,6 +90,41 @@ async function addItem(req:Request, res:Response){
     }
 }
 
+async function editItem(req:Request, res:Response){
+    const {token, id_item, nama, deskripsi, images} = req.query;
+    const cert = process.env.PRIVATE_KEY;
+    console.log('hello');
+    let decoded:any;
+    try {
+        decoded = jwt.verify(token, cert);
+    } catch (error) {
+        return res.status(401).json({msg: "Unauthorized"});
+    }
+    const user = decoded.user;
+    const o_id = new ObjectId(id_item?.toString());
+    try {
+        await client.connect();
+        const result = await client
+            .db("dbDitawar")
+            .collection("items")
+            .updateOne(
+                { _id: o_id },
+                {
+                $set: {
+                    nama: nama,
+                    deskripsi: deskripsi,
+                    images: images,
+                    user_id: user._id,
+                },
+                }
+            );
+        return res.status(201).json({msg: "Item updated", result:result});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
 async function getItem(req:Request, res:Response){
     console.log('hello');
     const cert = process.env.PRIVATE_KEY;
@@ -109,6 +144,6 @@ async function getItem(req:Request, res:Response){
     }
 }
 
-export {uploadFile as uploadFile, addItem as addItem, getItem as getItem, getImage as getImage};
+export {uploadFile as uploadFile, editItem as editItem, addItem as addItem, getItem as getItem, getImage as getImage};
 
-module.exports = {uploadFile, addItem, getItem, getImage}
+module.exports = {uploadFile, editItem, addItem, getItem, getImage}
