@@ -42,6 +42,7 @@ const getPurchaseDetail = async (req:Request, res:Response) => {
         const transaction = await client.db("dbDitawar").collection("transactions").findOne({_id: result.transaction});
         const purchaseObj = {
             _id: result._id,
+            purchase: result,
             buyer: buyer,
             seller: seller,
             item: item,
@@ -205,6 +206,11 @@ const finishPurchase = async (req:Request, res:Response) => {
                     type: "finished"
                 } } }
             );
+            const result2 = await client.db("dbDitawar").collection("purchases").updateOne(
+                { _id: new ObjectId(id.toString()) },
+                { $set: { status: "finished" } }
+            );
+            
             return res.status(201).json({msg: "purchase marked as finished", result: result});
         } catch (error) {
             console.error(error);
@@ -237,6 +243,38 @@ const endPurchase = async (req:Request, res:Response) => {
     }
 }
 
+const updatePurchase = async (req: Request, res: Response) => {
+    const { id } = req.query;
+    const { token, update } = req.body;
+    if (!id || !token || !update) return res.status(400).json({ msg: "Bad Request" });
+    const cert = process.env.PRIVATE_KEY;
+    let decoded: any;
+    try {
+        decoded = jwt.verify(token, cert);
+    } catch (error) {
+        return res.status(401).json({ msg: "Unauthorized" });
+    }
+    const user = decoded.user;
+    await client.connect();
+    const purchase = await client.db("dbDitawar").collection("purchases").findOne({ _id: new ObjectId(id?.toString() ?? '') });
+    if (!purchase) return res.status(400).json({ msg: "Purchase not found" });
+    if (purchase.seller != user._id) return res.status(400).json({ msg: "Unauthorized (User is not the seller)" });
+    const result = await client.db("dbDitawar").collection("purchases").updateOne(
+        { _id: new ObjectId(id.toString()) },
+        {
+            $push: {
+                history: {
+                    message: update,
+                    date: new Date(),
+                    time: new Date().getTime(),
+                    type: "update"
+                }
+            }
+        }
+    );
+    return res.status(201).json({ msg: "Purchase updated", result: result });
+}
+
 export {
     getAllPurchase as getAllPurchase,
     getPurchase as getPurchase,
@@ -245,7 +283,8 @@ export {
     endPurchase as endPurchase,
     getPurchaseDetail as getPurchaseDetail,
     markFinished as markFinished,
-    finishPurchase as finishPurchase
+    finishPurchase as finishPurchase,
+    updatePurchase as updatePurchase
 }
 
 module.exports = { 
@@ -256,5 +295,6 @@ module.exports = {
     endPurchase, 
     getPurchaseDetail,
     markFinished,
-    finishPurchase
+    finishPurchase,
+    updatePurchase
 };

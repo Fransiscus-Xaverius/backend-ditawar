@@ -45,7 +45,8 @@ import {
   endPurchase,
   getPurchaseDetail,
   markFinished,
-  finishPurchase
+  finishPurchase,
+  updatePurchase
 } from "../controller/purchaseController";
 
 
@@ -112,6 +113,7 @@ router.get("/purchase-detail", getPurchaseDetail); //get purchase detail by purc
 router.post('/purchase/mark', markFinished); //mark purchase as finished by seller (this marks that the seller has sent the item)
 router.post('/purchase/finished', endPurchase); //end purchase by buyer (this marks that the buyer has received the item)
 router.post('/purchase/finish', finishPurchase); //finish purchase by buyer (this marks that the buyer has received the item)
+router.post('/purchase/update', updatePurchase);
 
 //transaction endpoints
 router.get('/transaction', getTransaction);

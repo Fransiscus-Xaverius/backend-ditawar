@@ -40,5 +40,24 @@ async function getTransaction(req:Request, res:Response){;
     }
 }
 
+const finalizeTransaction = async (id:string, user:string) => {
+    try {
+        await client.connect();
+        const result = await client.db("dbDitawar").collection("transactions").findOne({_id: new ObjectId(id)});
+        if(!result){
+            return null;
+        }
+        if(result.type == "auction"){
+            
+        }
+        const update = await client.db("dbDitawar").collection("transactions").updateOne({_id: new ObjectId(id)}, {$set: {status: "FINALIZED"}});
+        return update;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+
 export {getTransaction as getTransaction};
 module.exports = {getTransaction};
