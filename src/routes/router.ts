@@ -56,6 +56,7 @@ import {
     getAllTransactionTopup,
     getTransaction, getTransactionbyId,
 } from "../controller/transactionController";
+import { createFeedback,getFeedbackByIdAuction } from "../controller/feedbackControllers";
 const router: Router = express.Router();
 
 //router
@@ -128,8 +129,8 @@ router.get('/transaction-sale', getAllTransactionSale);
 router.get('/transaction-purchase', getAllTransactionPurchase);
 
 //feedback endpoints
-// router.get('/feedback', getFeedback);
-// router.post('/feedback', addFeedback);
+router.get('/feedback', getFeedbackByIdAuction);
+router.post('/feedback', createFeedback);
 
 
 export default router;
