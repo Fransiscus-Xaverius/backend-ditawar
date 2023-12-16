@@ -51,6 +51,9 @@ import {
 
 
 import {
+    getAllTransactionPurchase,
+    getAllTransactionSale,
+    getAllTransactionTopup,
     getTransaction, getTransactionbyId,
 } from "../controller/transactionController";
 const router: Router = express.Router();
@@ -120,6 +123,13 @@ router.post('/purchase/update', updatePurchase);
 //transaction endpoints
 router.get('/transaction', getTransaction);
 router.get('/transaction-id', getTransactionbyId)
+router.get('/transaction-topup', getAllTransactionTopup);
+router.get('/transaction-sale', getAllTransactionSale);
+router.get('/transaction-purchase', getAllTransactionPurchase);
+
+//feedback endpoints
+// router.get('/feedback', getFeedback);
+// router.post('/feedback', addFeedback);
 
 
 export default router;

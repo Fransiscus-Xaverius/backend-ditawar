@@ -105,7 +105,29 @@ async function getTransactionbyId(req:Request, res:Response) {
     return res.status(200).json({msg: "Transaction Found", result:result});
 } 
 
+async function getAllTransactionTopup(req:Request, res:Response) {
+    const {id} = req.query;
+    await client.connect();
+    const o_id = new ObjectId(id?.toString() ?? '');
+    const result = await client.db("dbDitawar").collection("transactions").find({wallet_id: new ObjectId(o_id),type : "topup"}).toArray();
+    return res.status(200).json({msg: "Topup Found", result:result});
+}
+async function getAllTransactionSale(req:Request, res:Response) {
+    const {id} = req.query;
+    await client.connect();
+    const o_id = new ObjectId(id?.toString() ?? '');
+    const result = await client.db("dbDitawar").collection("transactions").find({wallet_id: new ObjectId(o_id),type : "sale"}).toArray();
+    return res.status(200).json({msg: "Topup Found", result:result});
+}
+async function getAllTransactionPurchase(req:Request, res:Response) {
+    const {id} = req.query;
+    await client.connect();
+    const o_id = new ObjectId(id?.toString() ?? '');
+    const result = await client.db("dbDitawar").collection("transactions").find({wallet_id: new ObjectId(o_id),type : "purchase"}).toArray();
+    return res.status(200).json({msg: "Topup Found", result:result});
+}
 
-export {getTransaction as getTransaction, finalizeTransaction as finalizeTransaction, getTransactionbyId as getTransactionbyId};
-module.exports = {getTransaction, finalizeTransaction, getTransactionbyId};
+
+export {getTransaction as getTransaction, finalizeTransaction as finalizeTransaction, getTransactionbyId as getTransactionbyId, getAllTransactionTopup as getAllTransactionTopup, getAllTransactionSale as getAllTransactionSale, getAllTransactionPurchase as getAllTransactionPurchase};
+module.exports = {getTransaction, finalizeTransaction, getTransactionbyId, getAllTransactionTopup, getAllTransactionSale, getAllTransactionPurchase};
 
