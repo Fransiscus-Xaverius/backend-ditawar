@@ -13,7 +13,7 @@ async function createFeedback(req: Request, res: Response) {
 		const result = await client.db("dbDitawar").collection("feedbacks").insertOne({
 			id_user: o_id,
 			id_auction: o_id2,
-			rating: rating,
+			
 			review: review,
 		});
 
@@ -21,6 +21,17 @@ async function createFeedback(req: Request, res: Response) {
 	} catch (error) {
 		return res.status(500).json({ message: "Internal server error" });
 	}
+}
+
+async function getAllFeedback(req: Request, res: Response) {
+	try {
+		await client.connect();
+		const result = await client.db("dbDitawar").collection("feedbacks").find({}).toArray();
+		return res.status(200).json({ message: "success", result: result });
+	} catch (error) {
+		return res.status(500).json({ message: "Internal server error" });
+	}
+	
 }
 
 // GET /feedback/:id
@@ -36,6 +47,6 @@ async function getFeedbackByIdAuction(req: Request, res: Response) {
     }
 }
 
-export { createFeedback as createFeedback, getFeedbackByIdAuction as getFeedbackByIdAuction };
+export { createFeedback as createFeedback, getFeedbackByIdAuction as getFeedbackByIdAuction, getAllFeedback as getAllFeedback };
 
-module.exports = { createFeedback, getFeedbackByIdAuction };
+module.exports = { createFeedback, getFeedbackByIdAuction, getAllFeedback };
