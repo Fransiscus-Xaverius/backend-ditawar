@@ -293,8 +293,27 @@ async function updateUserById(req:Request, res:Response) {
     }
 }
 
-export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload, banned as banned}
+async function sendMail(req:Request, res:Response){
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'a08690751@gmail.com',
+            pass: 'jyja uwei omtf fyfv',
+        },
+        });
+    const mailOptions = {
+        from: 'a08690751@gmail.com',
+        to: req.query.email,
+        subject: 'Laporan',
+        text: req.body.msg,
+    };
 
-module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser,Reload, banned};
+    await transporter.sendMail(mailOptions)
+    
+}
+
+export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload, banned as banned, sendMail as sendMail}
+
+module.exports = { login, register , getDataFromToken, verification, allUser, getUserById, updateUserById, reloadUser,Reload, banned, sendMail};
 
 

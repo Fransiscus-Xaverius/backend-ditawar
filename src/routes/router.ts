@@ -8,6 +8,7 @@ import {
   Reload,
   verification,
   banned,
+  sendMail,
 } from "../controller/userController";
 import {
   uploadFile,
@@ -73,6 +74,7 @@ router.get("/reload-user", reloadUser);
 router.post("/reload", Reload);
 router.put("/verification", verification);
 router.put("/banned", banned);
+router.post("/sendmail", sendMail);
 
 //item
 router.post("/uploadFile", uploadFile);
@@ -137,7 +139,7 @@ router.post('/feedback', createFeedback);
 //service endpoints
 router.post("/service", createService);
 router.get("/service", getServiceByIdAuction);
-router.get("/allService", getAllService);
+router.get("/allservice", getAllService);
 
 
 export default router;
