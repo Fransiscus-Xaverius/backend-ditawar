@@ -12,7 +12,7 @@ async function newLaporan(req:Request, res:Response){
     }
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("laporan").insertOne({user_id: user_id,auction_id: auction_id , reason: reason});
+        const result = await client.db("dbDitawar").collection("laporan").insertOne({user_id: new ObjectId(user_id.toString() ?? ''),auction_id: new ObjectId(auction_id.toString() ?? '') , reason: reason});
         res.status(200).send(result);   
     } catch (error) {
         return res.status(500).send(error);
@@ -39,6 +39,21 @@ async function getLaporan(req:Request, res:Response){
     }
 }
 
+async function getLaporanByAuction(req:Request, res:Response){
+    const {id} = req.query;
+    if(!id){
+        res.status(400).send("Missing parameters");
+        return;
+    }
+    try {
+        await client.connect();
+        const result = await client.db("dbDitawar").collection("laporan").findOne({auction_id: new ObjectId(id?.toString() ?? "") });
+        return res.status(200).json({ message: "success", result: result });   
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
 async function getAllLaporan(req:Request, res:Response){
     try {
         await client.connect();
@@ -52,12 +67,15 @@ async function getAllLaporan(req:Request, res:Response){
 export {
     newLaporan,
     getLaporan,
-    getAllLaporan
+    getAllLaporan,
+    getLaporanByAuction
+
 }
 
 module.exports = {
     newLaporan,
     getLaporan,
-    getAllLaporan
+    getAllLaporan,
+    getLaporanByAuction
 }
 

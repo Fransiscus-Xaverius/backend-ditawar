@@ -62,13 +62,15 @@ import { createService, getAllService, getServiceByIdAuction } from "../controll
 import {
   newRating,
   getUserRating,
-  getAllRating
+  getAllRating,
+  getRatingByAuction
 } from "../controller/ratingController";
 
 import {
   newLaporan,
   getLaporan,
-  getAllLaporan
+  getAllLaporan,
+  getLaporanByAuction
 } from "../controller/laporanController";
 
 
@@ -158,10 +160,12 @@ router.get("/allservice", getAllService);
 router.post('/rating', newRating);
 router.get('/rating', getUserRating);
 router.get('/allrating', getAllRating);
+router.get('/rating-auction', getRatingByAuction);
 
 //laporan endpoints
 router.post('/laporan', newLaporan);
 router.get('/laporan', getLaporan);
 router.get('/all-laporan', getAllLaporan);
+router.get('/laporan-auction', getLaporanByAuction);
 
 export default router;
