@@ -109,7 +109,7 @@ async function getAllTransactionTopup(req:Request, res:Response) {
     const {id} = req.query;
     await client.connect();
     const o_id = new ObjectId(id?.toString() ?? '');
-    const result = await client.db("dbDitawar").collection("transactions").find({wallet_id: new ObjectId(o_id),type : "topup"}).toArray();
+    const result = await client.db("dbDitawar").collection("transactions").find({wallet_id: new ObjectId(o_id),type : "topup","invoice.status" : "SETTLED"}).toArray();
     return res.status(200).json({msg: "Topup Found", result:result});
 }
 async function getAllTransactionSale(req:Request, res:Response) {
