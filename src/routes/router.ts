@@ -59,6 +59,19 @@ import {
 } from "../controller/transactionController";
 import { createFeedback,getAllFeedback,getFeedbackByIdAuction } from "../controller/feedbackControllers";
 import { createService, getAllService, getServiceByIdAuction } from "../controller/serviceController";
+import {
+  newRating,
+  getUserRating,
+  getAllRating
+} from "../controller/ratingController";
+
+import {
+  newLaporan,
+  getLaporan,
+  getAllLaporan
+} from "../controller/laporanController";
+
+
 const router: Router = express.Router();
 
 //router
@@ -141,5 +154,14 @@ router.post("/service", createService);
 router.get("/service", getServiceByIdAuction);
 router.get("/allservice", getAllService);
 
+//rating endpoints
+router.post('/rating', newRating);
+router.get('/rating', getUserRating);
+router.get('/allrating', getAllRating);
+
+//laporan endpoints
+router.post('/laporan', newLaporan);
+router.get('/laporan', getLaporan);
+router.get('/all-laporan', getAllLaporan);
 
 export default router;
