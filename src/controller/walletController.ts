@@ -18,7 +18,7 @@ async function validateWallet(id:any){
             // let saldo_tertahan = result.result.saldo_tertahan;
 
             for (let i = 0; i < history.length; i++) {
-                const element = history[i];
+                const element = history[i].transaction_id;
                 // console.log("KONTOL NJING")
                 // console.log(element)
                 const transaction = await client.db("dbDitawar").collection("transactions").findOne({_id: element});
@@ -66,7 +66,7 @@ async function getWallet(req:Request, res:Response){
         await validateWallet(id);
         await client.connect();
         const result = await client.db("dbDitawar").collection("wallets").findOne({id_user: new ObjectId(id?.toString() ?? '')});
-
+        
         return res.status(201).json({msg: "Wallet Found", result:result});
     } catch (error) {
         console.error(error);

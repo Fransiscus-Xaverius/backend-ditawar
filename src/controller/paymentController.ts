@@ -84,7 +84,13 @@ async function createInvoice (req:Request, res:Response) {
                 });
                 console.log(transaction);
                 try {
-                    const wallet = await client.db("dbDitawar").collection("wallets").updateOne({ _id: new ObjectId(wallet_id) }, { $push: { history: new ObjectId(transaction.insertedId) } });
+                    let newHistory ={
+                        transaction_id: new ObjectId(transaction.insertedId),
+                        type: "topup",
+                        amount: amount,
+                        date: new Date()
+                    }
+                    const wallet = await client.db("dbDitawar").collection("wallets").updateOne({ _id: new ObjectId(wallet_id) }, { $push: { history: newHistory } });
                     console.log(wallet);
                 } catch (error) {
                     return res.status(500).send("Internal Server Error");
