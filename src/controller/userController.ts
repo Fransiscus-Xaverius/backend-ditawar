@@ -15,7 +15,7 @@ async function login (req:Request,res:Response){
             return res.status(400).json({msg: "Please enter all fields"});
         }
         await client.connect();
-        const user = await client.db("dbDitawar").collection("users").findOne({email:email});
+        const user = await client.db("dbDitawar").collection("users").findOne({email:email,role : "verified"});
         if (!user) {
             return res.status(404).json({msg: "Invalid credentials"});
         }
@@ -138,10 +138,10 @@ async function register (req:Request, res:Response){
             role:"unverified",
             profile_picture:"default_avatar.jpg"
         }
-        await client.db("dbDitawar").collection("users").insertOne(newUser);
+        const result = await client.db("dbDitawar").collection("users").insertOne(newUser);
         const user = await client.db("dbDitawar").collection("users").findOne({email:email});
         const wallet = await newWallet(user._id, 0);
-        return res.status(200).json({msg: "User created successfully"});
+        return res.status(200).json({msg: "User created successfully",result : result});
     
     } catch (err) {
         console.error(err);
@@ -293,23 +293,23 @@ async function updateUserById(req:Request, res:Response) {
     }
 }
 
-async function sendMail(req:Request, res:Response){
+async function sendMail(req: Request, res: Response) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: 'a08690751@gmail.com',
             pass: 'jyja uwei omtf fyfv',
         },
-        });
+    });
     const mailOptions = {
         from: 'a08690751@gmail.com',
         to: req.query.email,
-        subject: 'Laporan',
-        text: req.body.msg,
+        subject: req.body.subject,
+        html: req.body.msg
+       
     };
 
-    await transporter.sendMail(mailOptions)
-    
+    await transporter.sendMail(mailOptions);
 }
 
 export {login as login, register as register, getDataFromToken as getDataFromToken, verification as verification, allUser as allUser, getUserById as getUserById, updateUserById as updateUserById, reloadUser as reloadUser,Reload as Reload, banned as banned, sendMail as sendMail}
