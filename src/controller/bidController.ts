@@ -103,6 +103,124 @@ async function addBid(req:Request, res:Response){
     }
 }
 
+async function buyNow(req: Request, res: Response){
+    try {
+        const {token, idAuction} = req.body;
+        const cert = process.env.PRIVATE_KEY;
+        let decoded:any;
+        try {
+            decoded = jwt.verify(token, cert);
+        } catch (error) {
+            return res.status(401).json({msg: "Unauthorized"});
+        }
+        try {
+            const user = decoded.user;
+            await client.connect();
+            const wallet = await client.db("dbDitawar").collection("wallets").findOne({id_user: new ObjectId(user._id)});
+            // console.log(user._id)
+            // console.log(wallet);
+            const saldo = wallet!.saldo;
+                      
+            const o_id = new ObjectId(idAuction?.toString() ?? '');
+            const result = await client.db("dbDitawar").collection("auctions").findOne({_id: o_id});
+            if(result){
+                if(result.asking_price > saldo){
+                    return res.status(400).json({msg: "Not enough balance"});
+                }
+                if(result.highest_bidder == 0 || result.highest_bidder == undefined){
+                    const resultt = await client.db("dbDitawar").collection("bids").insertOne({id_auction: o_id, id_user: user._id, bid: result.asking_price, highest: true, returned: false});
+                    // console.log(resultt.insertedId);
+                    const update = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$set: {highest_bid: resultt.insertedId, highest_bidder: user._id}});
+                    const newHistory = {
+                        wallet_id: wallet!._id,
+                        type: "bid",
+                        invoice: {
+                            auction_id: o_id,
+                            bid_id: resultt.insertedId,
+                            amount: result.asking_price,
+                            date: new Date(),
+                        }
+                    }
+                    const newSaldo = parseInt(saldo) - parseInt(result.asking_price);
+                    const newSaldoTertahan = parseInt(wallet!.saldo_tertahan) + parseInt(result.asking_price);
+                    const updateHistory = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$push: {history: newHistory}});
+                    const updateSaldo = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$set: {saldo: newSaldo, saldo_tertahan: newSaldoTertahan}});
+                    console.log("----------")
+                    console.log("user:",user._id)
+                    console.log("new saldo:",newSaldo);
+                    console.log("saldo tertahan:",newSaldoTertahan);
+                    console.log("saldo update:",updateSaldo);
+                    try {
+                        const o_id = new ObjectId(idAuction?.toString() ?? "");
+                        await client.connect();
+                        const result = await client
+                          .db("dbDitawar")
+                          .collection("auctions")
+                          .updateOne({ _id: o_id }, { $set: { tanggal_selesai: new Date(), ended: true } });
+                    } catch (error) {
+                        console.log(error);
+                        return res.status(500).json({ msg: "Internal server error" });
+                    }
+                    return res.status(201).json({msg: "Auction Ended", result:resultt});
+                }
+                else{
+                    // console.log(result.highest_bid)
+                    const highestBid = await client.db("dbDitawar").collection("bids").findOne({_id: new ObjectId(result.highest_bid)});
+                    // console.log("highest:", highestBid);
+                    if(highestBid && parseInt(highestBid.bid) < parseInt(result.asking_price)){
+                        console.log('NEW HIGHEST')
+                        const resultt= await client.db("dbDitawar").collection("bids").insertOne({id_auction: o_id, id_user: user._id, bid: result.asking_price, highest: true, returned: false});
+                        const updatePrevBid = await client.db("dbDitawar").collection("bids").updateOne({_id: new ObjectId(highestBid._id)}, {$set: {highest: false}});
+                        const update = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$set: {highest_bid: resultt.insertedId, highest_bidder: user._id}});
+                        const newHistory = {
+                            wallet_id: wallet!._id,
+                            type: "bid",
+                            invoice: {
+                                auction_id: o_id,
+                                bid_id: resultt.insertedId,
+                                amount: result.asking_price,
+                                date: new Date(),
+                            }
+                        }
+                        const newSaldo = parseInt(saldo) - parseInt(result.asking_price);
+                        const newSaldoTertahan = parseInt(wallet!.saldo_tertahan) + parseInt(result.asking_price);
+                        const updateHistory = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$push: {history: newHistory}});
+                        const updateSaldo = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$set: {saldo: newSaldo, saldo_tertahan: newSaldoTertahan}});
+                        console.log("----------")
+                        console.log("user:",user._id)
+                        console.log("new saldo:",newSaldo);
+                        console.log("saldo tertahan:",newSaldoTertahan);
+                        console.log("saldo update:",updateSaldo);
+                        try {
+                            const o_id = new ObjectId(idAuction?.toString() ?? "");
+                            await client.connect();
+                            const result = await client
+                              .db("dbDitawar")
+                              .collection("auctions")
+                              .updateOne({ _id: o_id }, { $set: { tanggal_selesai: new Date(), ended: true } });                            
+                          } catch (error) {
+                            console.log(error);
+                            return res.status(500).json({ msg: "Internal server error" });
+                          }
+                        return res.status(201).json({msg: "Auction ended", result:resultt}); 
+                    }
+                    console.log(result.asking_price, highestBid?.bid)
+                }
+                console.log("bid is lower");
+                return res.status(400).json({msg: "Asking Price is lower than current highest bid"});
+            }
+        } catch (error) {
+            console.log("error in db insert/update")
+            console.log(error)
+            return res.status(500).json({msg: "Internal DB server error"});
+        }
+    } catch (error) {
+        console.log("error in initial req")
+        return res.status(500).json({msg: "Request Error"});
+    }
+    
+}
+
 async function getBid(req:Request, res:Response){
     const {id} = req.query;
     console.log(id);
@@ -178,6 +296,6 @@ async function BidUpdate(){
     }
 }
 
-export {addBid as addBid, getBid as getBid,  BidUpdate as BidUpdate, HighBid as HighBid, getAllBid as getAllBid}
+export {addBid as addBid, getBid as getBid, buyNow as buyNow, BidUpdate as BidUpdate, HighBid as HighBid, getAllBid as getAllBid}
 
-module.exports = { addBid, getBid, BidUpdate, HighBid ,getAllBid};
+module.exports = { addBid, getBid, buyNow, BidUpdate, HighBid ,getAllBid};

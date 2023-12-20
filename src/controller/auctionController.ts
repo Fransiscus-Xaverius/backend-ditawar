@@ -172,7 +172,7 @@ async function AuctionUpdate() {
 
 async function updateAuction(req: Request, res: Response) {
   try {
-    const {
+    let {
       token,
       id_auction,
       starting_price,
@@ -183,7 +183,6 @@ async function updateAuction(req: Request, res: Response) {
       kecamatan,
       kota_kabupaten,
       provinsi,
-      highest_bid,
     } = req.query;
     const cert = process.env.PRIVATE_KEY;
     let decoded: any;
@@ -199,7 +198,9 @@ async function updateAuction(req: Request, res: Response) {
 
     await client.connect();
     const o_id = new ObjectId(id_auction?.toString());
-    const result = await client
+    let result;
+      console.log("tai")
+      result = await client
       .db("dbDitawar")
       .collection("auctions")
       .updateOne(
@@ -213,7 +214,6 @@ async function updateAuction(req: Request, res: Response) {
             kecamatan: kecamatan,
             kota_kabupaten: kota_kabupaten,
             provinsi: provinsi,
-            highest_bid: highest_bid,
           },
         }
       );
