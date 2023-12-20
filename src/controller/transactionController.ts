@@ -73,14 +73,20 @@ const finalizeTransaction = async (id:string, user:string) => {
 
         const newTransaction = {
             wallet_id: receive._id,
+            auction: result.auction,
             type: "sale",
             amount: result.invoice.amount,
+            date: new Date(),
+            from: result.buyer
         }
 
         const newTransaction2 = {
             wallet_id: give._id,
+            auction: result.auction,
             type: "purchase",
             amount: result.invoice.amount,
+            date: new Date(),
+            to: result.seller
         }
 
         const insertTransaction = await client.db("dbDitawar").collection("transactions").insertOne(newTransaction);

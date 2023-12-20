@@ -128,7 +128,7 @@ async function buyNow(req: Request, res: Response){
                     return res.status(400).json({msg: "Not enough balance"});
                 }
                 if(result.highest_bidder == 0 || result.highest_bidder == undefined){
-                    const resultt = await client.db("dbDitawar").collection("bids").insertOne({id_auction: o_id, id_user: user._id, bid: result.asking_price, highest: true, returned: false});
+                    const resultt = await client.db("dbDitawar").collection("bids").insertOne({id_auction: o_id, id_user: user._id, bid: parseInt(result.asking_price), highest: true, returned: false});
                     // console.log(resultt.insertedId);
                     const update = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$set: {highest_bid: resultt.insertedId, highest_bidder: user._id}});
                     const newHistory = {
@@ -156,7 +156,7 @@ async function buyNow(req: Request, res: Response){
                         const result = await client
                           .db("dbDitawar")
                           .collection("auctions")
-                          .updateOne({ _id: o_id }, { $set: { tanggal_selesai: new Date(), ended: true } });
+                          .updateOne({ _id: o_id }, { $set: { tanggal_selesai: new Date() } });
                     } catch (error) {
                         console.log(error);
                         return res.status(500).json({ msg: "Internal server error" });
