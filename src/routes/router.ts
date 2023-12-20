@@ -49,7 +49,9 @@ import {
   finishPurchase,
   updatePurchase
 } from "../controller/purchaseController";
-
+import {
+  createPayout
+} from "../controller/payoutController";
 
 import {
     getAllTransactionPurchase,
@@ -168,5 +170,8 @@ router.post('/laporan', newLaporan);
 router.get('/laporan', getLaporan);
 router.get('/all-laporan', getAllLaporan);
 router.get('/laporan-auction', getLaporanByAuction);
+
+//laporan payout
+router.post('/payout', createPayout);
 
 export default router;
