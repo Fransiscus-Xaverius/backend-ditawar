@@ -15,7 +15,7 @@ async function login (req:Request,res:Response){
             return res.status(400).json({msg: "Please enter all fields"});
         }
         await client.connect();
-        const user = await client.db("dbDitawar").collection("users").findOne({email:email,role : "verified"});
+        const user = await client.db("dbDitawar").collection("users").findOne({email:email});
         if (!user) {
             return res.status(404).json({msg: "Invalid credentials"});
         }
