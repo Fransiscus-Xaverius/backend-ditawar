@@ -12,7 +12,7 @@ async function newLaporan(req:Request, res:Response){
     }
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("laporan").insertOne({user_id: new ObjectId(user_id.toString() ?? ''),auction_id: new ObjectId(auction_id.toString() ?? '') , reason: reason});
+        const result = await client.db("dbDitawar").collection("laporan").insertOne({user_id: new ObjectId(user_id.toString() ?? ''),seller_id: new ObjectId(user_id.toString() ?? ''),auction_id: new ObjectId(auction_id.toString() ?? '') , reason: reason});
         res.status(200).send(result);   
     } catch (error) {
         return res.status(500).send(error);
