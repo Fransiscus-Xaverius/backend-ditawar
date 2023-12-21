@@ -55,6 +55,7 @@ async function addBid(req:Request, res:Response){
                     console.log("new saldo:",newSaldo);
                     console.log("saldo tertahan:",newSaldoTertahan);
                     console.log("saldo update:",updateSaldo);
+                    const updateBidCount = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$inc: {bid_count: 1}});
                     return res.status(201).json({msg: "Bid added", result:resultt});
                 }
                 else{
@@ -80,6 +81,7 @@ async function addBid(req:Request, res:Response){
                         const newSaldoTertahan = parseInt(wallet!.saldo_tertahan) + parseInt(bid);
                         const updateHistory = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$push: {history: newHistory}});
                         const updateSaldo = await client.db("dbDitawar").collection("wallets").updateOne({id_user: new ObjectId(user._id)}, {$set: {saldo: newSaldo, saldo_tertahan: newSaldoTertahan}});
+                        const updateBidCount = await client.db("dbDitawar").collection("auctions").updateOne({_id: o_id}, {$inc: {bid_count: 1}});
                         console.log("----------")
                         console.log("user:",user._id)
                         console.log("new saldo:",newSaldo);

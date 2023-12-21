@@ -42,6 +42,7 @@ async function addAuction(req: Request, res: Response) {
       tanggal_selesai: new Date(tanggal_selesai + " " + jam_selesai),
       highest_bid: null,
       ended: false,
+      bid_count: 0,
     };
     await client.connect();
     const result = await client
