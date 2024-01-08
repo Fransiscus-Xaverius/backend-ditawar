@@ -5,14 +5,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function newLaporan(req:Request, res:Response){
-    const {user_id, auction_id, reason} = req.query;
-    if(!user_id || !auction_id || !reason){
+    const {cust_id, seller_id, auction_id, reason} = req.query;
+    if(!cust_id || !seller_id || !auction_id || !reason){
         res.status(400).send("Missing parameters");
         return;
     }
     try {
         await client.connect();
-        const result = await client.db("dbDitawar").collection("laporan").insertOne({user_id: new ObjectId(user_id.toString() ?? ''),seller_id: new ObjectId(user_id.toString() ?? ''),auction_id: new ObjectId(auction_id.toString() ?? '') , reason: reason});
+        const result = await client.db("dbDitawar").collection("laporan").insertOne({buyer_id: new ObjectId(cust_id.toString() ?? ''),seller_id: new ObjectId(seller_id.toString() ?? ''),auction_id: new ObjectId(auction_id.toString() ?? '') , reason: reason});
         res.status(200).send(result);   
     } catch (error) {
         return res.status(500).send(error);
