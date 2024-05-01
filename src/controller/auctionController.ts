@@ -257,6 +257,7 @@ async function getSampleAuctions(req: Request, res: Response) {
       },
     ];
     await client.connect();
+    console.log("Sample Called")
     const result = await client
       .db("dbDitawar")
       .collection("auctions")
