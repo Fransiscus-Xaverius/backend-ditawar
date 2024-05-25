@@ -188,7 +188,7 @@ async function verification(req:Request, res:Response){
         if(result.role == "unverified"){
             await client.db("dbDitawar").collection("users").updateOne({_id: o_id},{$set:{role:"verified"}});
             const transporter = nodemailer.createTransport({
-                service: 'gmail',
+                service: process.env.COMPANY_MAIL_SERVICE,
                 auth: {
                     user: process.env.COMPANY_MAIL,
                     pass: process.env.COMPANY_MAIL_PASSWORD,
