@@ -190,17 +190,16 @@ async function verification(req:Request, res:Response){
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'a08690751@gmail.com',
-                    pass: 'jyja uwei omtf fyfv',
+                    user: process.env.COMPANY_MAIL,
+                    pass: process.env.COMPANY_MAIL_PASSWORD,
                 },
                 });
             const mailOptions = {
-                from: 'a08690751@gmail.com',
+                from: process.env.COMPANY_MAIL,
                 to: result.email,
                 subject: 'Verified Account',
-                text: 'Hello, Your account has been verified.',
+                text: 'Your account has been verified.',
             };
-
             await transporter.sendMail(mailOptions)
         }
         return res.status(201).json({msg: "User Verified"});
