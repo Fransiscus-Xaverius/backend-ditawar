@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import client from "../database/database";
 const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
+import ENV from "../config/environments";
+import { AuctionDto } from "../contracts/dto/auction.dto";
 const nodemailer = require("nodemailer");
 
 async function addAuction(req: Request, res: Response) {
@@ -18,7 +20,7 @@ async function addAuction(req: Request, res: Response) {
       kota_kabupaten,
       provinsi,
     } = req.body;
-    const cert = process.env.PRIVATE_KEY;
+    const cert = ENV.PRIVATE_KEY;
     let decoded: any;
     try {
       decoded = jwt.verify(token, cert);
@@ -28,7 +30,7 @@ async function addAuction(req: Request, res: Response) {
     const user = decoded.user;
     console.log(tanggal_selesai);
     console.log(new Date(tanggal_selesai + " " + jam_selesai));
-    const newAuction = {
+    const newAuction: AuctionDto = {
       id_user: user._id,
       nama_penjual: user.nama,
       id_barang: id_barang,
@@ -85,7 +87,7 @@ async function AuctionUpdate() {
           .collection("bids")
           .findOne({ _id: new ObjectId(auction.highest_bid) });
         if (highestBid) {
-          const item = await client.db("dbDitawar").collection("items").findOne({_id: new ObjectId(auction.id_barang)});
+          const item = await client.db("dbDitawar").collection("items").findOne({ _id: new ObjectId(auction.id_barang) });
           if (item) {
             const seller = await client
               .db("dbDitawar")
@@ -185,7 +187,7 @@ async function updateAuction(req: Request, res: Response) {
       kota_kabupaten,
       provinsi,
     } = req.query;
-    const cert = process.env.PRIVATE_KEY;
+    const cert = ENV.PRIVATE_KEY;
     let decoded: any;
     console.log(id_auction)
     try {
@@ -200,8 +202,8 @@ async function updateAuction(req: Request, res: Response) {
     await client.connect();
     const o_id = new ObjectId(id_auction?.toString());
     let result;
-      console.log("tai")
-      result = await client
+    console.log("tai")
+    result = await client
       .db("dbDitawar")
       .collection("auctions")
       .updateOne(
@@ -230,7 +232,7 @@ async function updateAuction(req: Request, res: Response) {
 }
 
 async function getAllAuction(req: Request, res: Response) {
-  const cert = process.env.PRIVATE_KEY;
+  const cert = ENV.PRIVATE_KEY;
   try {
     await client.connect();
     const result = await client
@@ -272,7 +274,7 @@ async function getSampleAuctions(req: Request, res: Response) {
 }
 
 async function getAuction(req: Request, res: Response) {
-  const cert = process.env.PRIVATE_KEY;
+  const cert = ENV.PRIVATE_KEY;
   const { id } = req.query;
   // console.log(id);
   try {
@@ -296,14 +298,14 @@ async function buyNowHandler(req: Request, res: Response) {
   const actualToken = Array.isArray(token)
     ? token[0].split(" ")[1]
     : token?.split(" ")[1];
-  const cert = process.env.PRIVATE_KEY;
+  const cert = ENV.PRIVATE_KEY;
   let decoded: any;
   try {
     decoded = jwt.verify(actualToken, cert);
   } catch (error) {
     return res.status(401).json({ msg: "Unauthorized" });
   }
-  
+
   const o_id = new ObjectId(decoded.user._id.toString() ?? "");
   // const newTransaction = {
   //   id_auction: decoded.user._id,

@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import dotenv from 'dotenv';
-dotenv.config();
 import client from "../database/database";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
 import { trusted } from "mongoose";
-const authToken = Buffer.from(`${process.env.XENDIT_AUTH_TOKEN}:`).toString("base64");
+import ENV from "../config/environments";
+const authToken = Buffer.from(`${ENV.XENDIT_AUTH_TOKEN}:`).toString("base64");
 
-async function createInvoice (req:Request, res:Response) {
-    const {nama, email, phone, desc, amount, city, kode_pos, provinsi, alamat, wallet_id} = req.body;
+async function createInvoice(req: Request, res: Response) {
+    const { nama, email, phone, desc, amount, city, kode_pos, provinsi, alamat, wallet_id } = req.body;
     console.log('payment called')
     console.log(req.body);
     try {
@@ -18,10 +17,9 @@ async function createInvoice (req:Request, res:Response) {
         const { data, status } = await axios.post(
             `https://api.xendit.co/v2/invoices`,
             {
-                external_id: `invoice-${
-                    Math.random().toString(36).split(".")[1]
-                }`,
-                amount: parseInt(amount)+5000,
+                external_id: `invoice-${Math.random().toString(36).split(".")[1]
+                    }`,
+                amount: parseInt(amount) + 5000,
                 description: desc,
                 invoice_duration: 86400,
                 customer: {
@@ -69,13 +67,13 @@ async function createInvoice (req:Request, res:Response) {
             }
         );
 
-        if(status==200){
+        if (status == 200) {
             try {
                 await client.connect();
                 const transaction = await client.db("dbDitawar").collection("transactions").insertOne({
                     wallet_id: new ObjectId(wallet_id),
                     type: "topup",
-                    invoice:{
+                    invoice: {
                         xendit_id: data.id,
                         amount: amount,
                         status: data.status,
@@ -84,7 +82,7 @@ async function createInvoice (req:Request, res:Response) {
                 });
                 console.log(transaction);
                 try {
-                    let newHistory ={
+                    let newHistory = {
                         transaction_id: new ObjectId(transaction.insertedId),
                         type: "topup",
                         amount: amount,
@@ -99,7 +97,7 @@ async function createInvoice (req:Request, res:Response) {
                 return res.status(500).send("Internal Server Error");
             }
         }
-        else{
+        else {
             return res.status(status).send(data);
         }
 
@@ -111,7 +109,7 @@ async function createInvoice (req:Request, res:Response) {
 };
 
 //expire invoice xendit
-const ExpireInvoice = async (req:Request, res:Response) => {
+const ExpireInvoice = async (req: Request, res: Response) => {
     const result = { ...req.body };
     try {
         const { data, status } = await axios.post(
@@ -129,12 +127,12 @@ const ExpireInvoice = async (req:Request, res:Response) => {
     }
 };
 
-const getInvoiceStatus = async (id:ObjectId) => {
+const getInvoiceStatus = async (id: ObjectId) => {
     try {
-        const transaction = await client.db("dbDitawar").collection("transactions").findOne({_id: id});
-        if(transaction){
+        const transaction = await client.db("dbDitawar").collection("transactions").findOne({ _id: id });
+        if (transaction) {
             const invoice = transaction.invoice;
-            if(invoice.status == "PENDING"){
+            if (invoice.status == "PENDING") {
                 const { data, status } = await axios.get(
                     `https://api.xendit.co/v2/invoices/${invoice.xendit_id}`,
                     {
@@ -143,26 +141,26 @@ const getInvoiceStatus = async (id:ObjectId) => {
                         },
                     }
                 );
-                if(data.status == "EXPIRED"){
-                    const result = await client.db("dbDitawar").collection("transactions").updateOne({_id: id}, {$set: {"invoice.status": "EXPIRED"}});
+                if (data.status == "EXPIRED") {
+                    const result = await client.db("dbDitawar").collection("transactions").updateOne({ _id: id }, { $set: { "invoice.status": "EXPIRED" } });
                     return "EXPIRED";
                 }
-                else if(data.status == "SETTLED"){
-                    const result = await client.db("dbDitawar").collection("transactions").updateOne({_id: id}, {$set: {"invoice.status": "SETTLED"}});
+                else if (data.status == "SETTLED") {
+                    const result = await client.db("dbDitawar").collection("transactions").updateOne({ _id: id }, { $set: { "invoice.status": "SETTLED" } });
                     return "SETTLED";
                 }
-                else{
+                else {
                     return "PENDING";
                 }
             }
-            else{
+            else {
                 return invoice.status;
             }
         }
-        else{
+        else {
             return null;
         }
-        
+
     } catch (error) {
         console.error(error);
         return null;
@@ -170,7 +168,7 @@ const getInvoiceStatus = async (id:ObjectId) => {
 }
 
 //get by id invoice xendit
-const GetInvoicebyInvoice_id = async (req:Request, res:Response) => {
+const GetInvoicebyInvoice_id = async (req: Request, res: Response) => {
     const result = { ...req.body };
     try {
         const { data, status } = await axios.get(
@@ -188,7 +186,7 @@ const GetInvoicebyInvoice_id = async (req:Request, res:Response) => {
 };
 
 //get by external id
-const GetInvoicebyExternal_id = async (req:Request, res:Response) => {
+const GetInvoicebyExternal_id = async (req: Request, res: Response) => {
     const result = { ...req.body };
     try {
         const { data, status } = await axios.get(
@@ -207,7 +205,7 @@ const GetInvoicebyExternal_id = async (req:Request, res:Response) => {
 
 
 //untuk admin
-const GetAllInvoice = async (req:Request, res:Response) => {
+const GetAllInvoice = async (req: Request, res: Response) => {
     try {
         const { data, status } = await axios.get(
             `https://api.xendit.co/v2/invoices`,
@@ -223,7 +221,7 @@ const GetAllInvoice = async (req:Request, res:Response) => {
     }
 };
 
-const GetAllTransactions = async (req:Request, res:Response) => {
+const GetAllTransactions = async (req: Request, res: Response) => {
     try {
         await client.connect();
         const transactions = await client.db("dbDitawar").collection("transactions").find().toArray();
@@ -234,21 +232,21 @@ const GetAllTransactions = async (req:Request, res:Response) => {
 };
 
 export {
-    createInvoice as createInvoice, 
-    ExpireInvoice as ExpireInvoice, 
-    GetInvoicebyInvoice_id as GetInvoicebyInvoice_id, 
-    GetInvoicebyExternal_id as GetInvoicebyExternal_id, 
-    GetAllInvoice as GetAllInvoice, 
+    createInvoice as createInvoice,
+    ExpireInvoice as ExpireInvoice,
+    GetInvoicebyInvoice_id as GetInvoicebyInvoice_id,
+    GetInvoicebyExternal_id as GetInvoicebyExternal_id,
+    GetAllInvoice as GetAllInvoice,
     getInvoiceStatus as getInvoiceStatus,
     GetAllTransactions as GetAllTransactions
 }
 
-module.exports = { 
-    createInvoice, 
-    ExpireInvoice, 
-    GetInvoicebyInvoice_id, 
-    GetInvoicebyExternal_id, 
-    GetAllInvoice, 
+module.exports = {
+    createInvoice,
+    ExpireInvoice,
+    GetInvoicebyInvoice_id,
+    GetInvoicebyExternal_id,
+    GetAllInvoice,
     getInvoiceStatus,
     GetAllTransactions
 };

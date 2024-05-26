@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 import client from "../database/database";
 import { ObjectId } from "mongodb";
 import path, { dirname } from "path";
+import ENV from "../config/environments";
 
 function makeid(length:number) {
     let result = '';
@@ -65,7 +66,7 @@ function getImage(req:Request, res:Response):any {
 
 async function addItem(req:Request, res:Response){
     const {token, nama, deskripsi, images} = req.query;
-    const cert = process.env.PRIVATE_KEY;
+    const cert = ENV.PRIVATE_KEY;
     console.log('hello');
     let decoded:any;
     try {
@@ -92,7 +93,7 @@ async function addItem(req:Request, res:Response){
 
 async function editItem(req:Request, res:Response){
     const {token, id_item, nama, deskripsi, images} = req.query;
-    const cert = process.env.PRIVATE_KEY;
+    const cert = ENV.PRIVATE_KEY;
     console.log('hello');
     let decoded:any;
     try {
@@ -127,7 +128,7 @@ async function editItem(req:Request, res:Response){
 
 async function getItem(req:Request, res:Response){
     console.log('hello');
-    const cert = process.env.PRIVATE_KEY;
+    const cert = ENV.PRIVATE_KEY;
     const {id} = req.query;
     console.log(id);
     try {

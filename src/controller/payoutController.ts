@@ -7,7 +7,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
 import { trusted } from "mongoose";
-const authToken = Buffer.from(`${process.env.XENDIT_AUTH_TOKEN}:`).toString("base64");
+import ENV from "../config/environments";
+const authToken = Buffer.from(`${ENV.XENDIT_AUTH_TOKEN}:`).toString("base64");
 
 async function createPayout(req:Request, res:Response){
     const {nama,nama_rekening, email, phone, desc, amount, city, kode_pos, provinsi, alamat, wallet_id} = req.body;

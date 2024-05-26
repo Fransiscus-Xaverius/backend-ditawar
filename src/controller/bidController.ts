@@ -4,11 +4,12 @@ dotenv.config();
 import client from "../database/database";
 const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
+import ENV from "../config/environments";
 
 async function addBid(req:Request, res:Response){
     try {
         const {token, idAuction, bid} = req.body;
-        const cert = process.env.PRIVATE_KEY;
+        const cert = ENV.PRIVATE_KEY;
         let decoded:any;
         try {
             decoded = jwt.verify(token, cert);
@@ -108,7 +109,7 @@ async function addBid(req:Request, res:Response){
 async function buyNow(req: Request, res: Response){
     try {
         const {token, idAuction} = req.body;
-        const cert = process.env.PRIVATE_KEY;
+        const cert = ENV.PRIVATE_KEY;
         let decoded:any;
         try {
             decoded = jwt.verify(token, cert);

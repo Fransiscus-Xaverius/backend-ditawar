@@ -1,21 +1,22 @@
-import express, {Express} from 'express';
+import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import router from './src/routes/router';
 const cors = require('cors');
 import path from 'path';
 import { AuctionUpdate } from './src/controller/auctionController';
 import { BidUpdate } from './src/controller/bidController';
+import ENV from './src/config/environments';
 
 dotenv.config();
 
-const app:Express = express();
+const app: Express = express();
 app.use(express.json());
-const port = process.env.PORT;
-app.use(cors());   
+const port = ENV.PORT;
+app.use(cors());
 app.use('/', router);
 app.use('/static', express.static('public/images'))
 
-setInterval(function() {
+setInterval(function () {
     AuctionUpdate();
     BidUpdate();
 }, 1000);
