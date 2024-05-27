@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
 import ENV from "../config/environments";
 import { AuctionDto } from "../contracts/dto/auction.dto";
+import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from "../config/messages";
 const nodemailer = require("nodemailer");
 
 async function addAuction(req: Request, res: Response) {
@@ -25,7 +26,7 @@ async function addAuction(req: Request, res: Response) {
     try {
       decoded = jwt.verify(token, cert);
     } catch (error) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     console.log(tanggal_selesai);
@@ -193,7 +194,7 @@ async function updateAuction(req: Request, res: Response) {
     try {
       decoded = jwt.verify(token, cert);
     } catch (error) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     console.log(tanggal_selesai);
@@ -303,7 +304,7 @@ async function buyNowHandler(req: Request, res: Response) {
   try {
     decoded = jwt.verify(actualToken, cert);
   } catch (error) {
-    return res.status(401).json({ msg: "Unauthorized" });
+    return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
   }
 
   const o_id = new ObjectId(decoded.user._id.toString() ?? "");

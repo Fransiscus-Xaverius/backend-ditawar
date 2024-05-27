@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 import { newWallet } from "./walletController";
 import { ObjectId } from "mongodb";
 import ENV from "../config/environments";
+import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from "../config/messages";
 const nodemailer = require('nodemailer');
 
 async function login(req: Request, res: Response) {
@@ -71,7 +72,7 @@ async function reloadUser(req: Request, res: Response) {
         try {
             decoded = jwt.verify(token, cert);
         } catch (error) {
-            return res.status(401).json({ msg: "Unauthorized" });
+            return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
         }
         const user = decoded.user;
         const result = await client.db("dbDitawar").collection("users").findOne({ _id: new ObjectId(user._id) });
@@ -106,7 +107,7 @@ async function getDataFromToken(req: Request, res: Response) {
     const cert = ENV.PRIVATE_KEY;
     jwt.verify(token, cert, function (err: any, payload: any) {
         if (err) {
-            return res.status(401).json({ msg: "Unauthorized" });
+            return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
         }
         else {
             console.log("USERDATA:", payload);

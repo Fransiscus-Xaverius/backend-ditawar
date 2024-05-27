@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 import client from "../database/database";
 import { ObjectId } from "mongodb";
 import ENV from "../config/environments";
+import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from "../config/messages";
 
 async function getTransaction(req: Request, res: Response) {
     ;
@@ -20,7 +21,7 @@ async function getTransaction(req: Request, res: Response) {
         try {
             decoded = jwt.verify(token!.toString(), cert);
         } catch (error) {
-            return res.status(401).json({ msg: "Unauthorized" });
+            return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
         }
 
         try {

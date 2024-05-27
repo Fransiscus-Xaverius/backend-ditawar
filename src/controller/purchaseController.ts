@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 const jwt = require("jsonwebtoken");
 import { finalizeTransaction } from './transactionController';
 import ENV from '../config/environments';
+import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from '../config/messages';
 
 const getAllPurchase = async (req: Request, res: Response) => {
     try {
@@ -64,7 +65,7 @@ const getAllPurchaseAsSeller = async (req: Request, res: Response) => {
     try {
         decoded = jwt.verify(token, cert);
     } catch (error) {
-        return res.status(401).json({ msg: "Unauthorized" });
+        return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     const { _id } = user;
@@ -86,7 +87,7 @@ const getAllPurchaseAsBuyer = async (req: Request, res: Response) => {
     try {
         decoded = jwt.verify(token, cert);
     } catch (error) {
-        return res.status(401).json({ msg: "Unauthorized" });
+        return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     const { _id } = user;
@@ -119,7 +120,7 @@ async function markFinished(req: Request, res: Response) {
         try {
             decoded = jwt.verify(token!.toString(), cert);
         } catch (error) {
-            return res.status(401).json({ msg: "Unauthorized" });
+            return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
         }
 
         try {
@@ -130,7 +131,7 @@ async function markFinished(req: Request, res: Response) {
             }
             const user = decoded.user;
             if (purchase.seller != user._id) {
-                return res.status(401).json({ msg: "Unauthorized" });
+                return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
             }
         }
         catch (error) {
@@ -180,7 +181,7 @@ const finishPurchase = async (req: Request, res: Response) => {
         try {
             decoded = jwt.verify(token!.toString(), cert);
         } catch (error) {
-            return res.status(401).json({ msg: "Unauthorized" });
+            return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
         }
         let purchase = null;
         try {
@@ -191,7 +192,7 @@ const finishPurchase = async (req: Request, res: Response) => {
             }
             const user = decoded.user;
             if (purchase.buyer != user._id) {
-                return res.status(401).json({ msg: "Unauthorized" });
+                return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
             }
         }
         catch (error) {
@@ -266,7 +267,7 @@ const updatePurchase = async (req: Request, res: Response) => {
     try {
         decoded = jwt.verify(token, cert);
     } catch (error) {
-        return res.status(401).json({ msg: "Unauthorized" });
+        return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     await client.connect();

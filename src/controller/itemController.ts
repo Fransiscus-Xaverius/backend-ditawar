@@ -8,6 +8,7 @@ import client from "../database/database";
 import { ObjectId } from "mongodb";
 import path, { dirname } from "path";
 import ENV from "../config/environments";
+import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from "../config/messages";
 
 function makeid(length:number) {
     let result = '';
@@ -72,7 +73,7 @@ async function addItem(req:Request, res:Response){
     try {
         decoded = jwt.verify(token, cert);
     } catch (error) {
-        return res.status(401).json({msg: "Unauthorized"});
+        return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     const newItem = {
@@ -99,7 +100,7 @@ async function editItem(req:Request, res:Response){
     try {
         decoded = jwt.verify(token, cert);
     } catch (error) {
-        return res.status(401).json({msg: "Unauthorized"});
+        return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
     const o_id = new ObjectId(id_item?.toString());
