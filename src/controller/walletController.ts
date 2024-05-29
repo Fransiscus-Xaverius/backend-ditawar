@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import client from "../database/database";
 import { ObjectId } from "mongodb";
 import { getInvoiceStatus } from "./paymentController";
+import { HTTP_STATUS_CODES } from "../config/messages";
 
 async function validateWallet(id: any) {
     try {
@@ -65,10 +66,10 @@ async function getWallet(req: Request, res: Response) {
         await client.connect();
         const result = await client.db("dbDitawar").collection("wallets").findOne({ id_user: new ObjectId(id?.toString() ?? '') });
 
-        return res.status(201).json({ msg: "Wallet Found", result: result });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "Wallet Found", result: result });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -77,9 +78,9 @@ async function addSaldo(req: Request, res: Response) {
         const { id_user, saldo } = req.query;
         await client.connect();
         const result = await client.db("dbDitawar").collection("wallets").updateOne({ id_user: id_user }, { $set: { saldo: saldo } });
-        return res.status(201).json({ msg: "Successfully added Saldo to wallet!", result: result });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "Successfully added Saldo to wallet!", result: result });
     } catch (error) {
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -88,9 +89,9 @@ async function useSaldo(req: Request, res: Response) {
         const { id_user, saldo } = req.query;
         await client.connect();
         const result = await client.db("dbDitawar").collection("wallets").updateOne({ id_user: id_user }, { $set: { saldo: saldo } });
-        return res.status(201).json({ msg: "Payment via wallet successful", result: result });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "Payment via wallet successful", result: result });
     } catch (error) {
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 

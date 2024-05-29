@@ -4,7 +4,11 @@ const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
 import ENV from "../config/environments";
 import { AuctionDto } from "../contracts/dto/auction.dto";
-import { HTTP_STATUS_CODES, SERVER_RESPONSE_MESSAGES } from "../config/messages";
+import {
+  HTTP_STATUS_CODES,
+  SERVER_RESPONSE_MESSAGES,
+} from "../config/messages";
+import { logger } from "../services/logger.service";
 const nodemailer = require("nodemailer");
 
 async function addAuction(req: Request, res: Response) {
@@ -26,11 +30,15 @@ async function addAuction(req: Request, res: Response) {
     try {
       decoded = jwt.verify(token, cert);
     } catch (error) {
-      return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
+      return res
+        .status(HTTP_STATUS_CODES.UNAUTHORIZED)
+        .json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
-    console.log(tanggal_selesai);
-    console.log(new Date(tanggal_selesai + " " + jam_selesai));
+    logger.log(tanggal_selesai);
+    // console.log(tanggal_selesai);
+    logger.log(new Date(tanggal_selesai + " " + jam_selesai));
+    // console.log(new Date(tanggal_selesai + " " + jam_selesai));
     const newAuction: AuctionDto = {
       id_user: user._id,
       nama_penjual: user.nama,
@@ -53,12 +61,18 @@ async function addAuction(req: Request, res: Response) {
       .collection("auctions")
       .insertOne(newAuction);
     if (result) {
-      return res.status(201).json({ msg: "Auction added", result: result });
+      return res
+        .status(HTTP_STATUS_CODES.CREATED)
+        .json({ msg: "Auction added", result: result });
     }
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   } catch (error) {
     // console.log(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -75,7 +89,8 @@ async function AuctionUpdate() {
       const auction = result[i];
       const end = new Date(auction.tanggal_selesai);
       if (now > end) {
-        console.log("Found auction to end");
+        logger.log("Found auction to end");
+        // console.log("Found auction to end");
         await client
           .db("dbDitawar")
           .collection("auctions")
@@ -88,7 +103,10 @@ async function AuctionUpdate() {
           .collection("bids")
           .findOne({ _id: new ObjectId(auction.highest_bid) });
         if (highestBid) {
-          const item = await client.db("dbDitawar").collection("items").findOne({ _id: new ObjectId(auction.id_barang) });
+          const item = await client
+            .db("dbDitawar")
+            .collection("items")
+            .findOne({ _id: new ObjectId(auction.id_barang) });
           if (item) {
             const seller = await client
               .db("dbDitawar")
@@ -144,7 +162,8 @@ async function AuctionUpdate() {
                       },
                     }
                   );
-                console.log(update);
+                logger.log(update);
+                // console.log(update);
 
                 const newPurchase = {
                   buyer: buyer._id,
@@ -170,7 +189,8 @@ async function AuctionUpdate() {
       // }
     }
   } catch (error) {
-    console.log(error);
+    logger.log(error);
+    // console.log(error);
   }
 }
 
@@ -190,20 +210,26 @@ async function updateAuction(req: Request, res: Response) {
     } = req.query;
     const cert = ENV.PRIVATE_KEY;
     let decoded: any;
-    console.log(id_auction)
+    logger.log(id_auction);
+    // console.log(id_auction);
     try {
       decoded = jwt.verify(token, cert);
     } catch (error) {
-      return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
+      return res
+        .status(HTTP_STATUS_CODES.UNAUTHORIZED)
+        .json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
     }
     const user = decoded.user;
-    console.log(tanggal_selesai);
-    console.log(new Date(tanggal_selesai + " " + jam_selesai));
+    logger.log(tanggal_selesai);
+    // console.log(tanggal_selesai);
+    logger.log(new Date(tanggal_selesai + " " + jam_selesai));
+    // console.log(new Date(tanggal_selesai + " " + jam_selesai));
 
     await client.connect();
     const o_id = new ObjectId(id_auction?.toString());
     let result;
-    console.log("tai")
+    logger.log("tai");
+    // console.log("tai");
     result = await client
       .db("dbDitawar")
       .collection("auctions")
@@ -222,13 +248,19 @@ async function updateAuction(req: Request, res: Response) {
         }
       );
     if (result.modifiedCount > 0) {
-      return res.status(200).json({ msg: "Auction updated" });
+      return res
+        .status(HTTP_STATUS_CODES.SUCCESS)
+        .json({ msg: "Auction updated" });
     } else {
-      return res.status(404).json({ msg: "Auction not found" });
+      return res
+        .status(HTTP_STATUS_CODES.NOT_FOUND)
+        .json({ msg: "Auction not found" });
     }
   } catch (error) {
     // console.log(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -241,11 +273,17 @@ async function getAllAuction(req: Request, res: Response) {
       .collection("auctions")
       .find()
       .toArray();
-    console.log(result);
-    return res.status(201).json({ msg: "Item Found", result: result });
+
+    logger.log(result);
+    // console.log(result);
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Item Found", result: result });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -260,17 +298,22 @@ async function getSampleAuctions(req: Request, res: Response) {
       },
     ];
     await client.connect();
-    console.log("Sample Called")
+    logger.log("Sample Called");
+    // console.log("Sample Called");
     const result = await client
       .db("dbDitawar")
       .collection("auctions")
       .aggregate(filter)
       .toArray();
     // console.log(result);
-    return res.status(201).json({ msg: "Item Found", result: result });
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Item Found", result: result });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -285,10 +328,14 @@ async function getAuction(req: Request, res: Response) {
       .db("dbDitawar")
       .collection("auctions")
       .findOne({ _id: o_id });
-    return res.status(201).json({ msg: "Item Found", result: result });
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Item Found", result: result });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -304,7 +351,9 @@ async function buyNowHandler(req: Request, res: Response) {
   try {
     decoded = jwt.verify(actualToken, cert);
   } catch (error) {
-    return res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
+    return res
+      .status(HTTP_STATUS_CODES.UNAUTHORIZED)
+      .json({ msg: SERVER_RESPONSE_MESSAGES.UNAUTHORIZED });
   }
 
   const o_id = new ObjectId(decoded.user._id.toString() ?? "");
@@ -354,7 +403,8 @@ async function getAuctionByQuery(req: Request, res: Response) {
           .db("dbDitawar")
           .collection("auctions")
           .findOne({ id_barang: id, ended: false });
-        console.log(auction);
+        logger.log(auction);
+        // console.log(auction);
         if (auction) {
           let data = {
             item: item,
@@ -364,12 +414,18 @@ async function getAuctionByQuery(req: Request, res: Response) {
         }
       }
     } catch (error) {
-      return res.status(500).json({ msg: "Internal server error" });
+      return res
+        .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json({ msg: "Internal server error" });
     }
-    return res.status(201).json({ msg: "Item Found", result: result });
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Item Found", result: result });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -382,10 +438,15 @@ async function stopAuction(req: Request, res: Response) {
       .db("dbDitawar")
       .collection("auctions")
       .updateOne({ _id: o_id }, { $set: { ended: true } });
-    return res.status(201).json({ msg: "Auction ended", result: result });
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Auction ended", result: result });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    logger.log(error);
+    // console.log(error);
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 
@@ -413,10 +474,15 @@ async function warningAuction(req: Request, res: Response) {
     };
 
     await transporter.sendMail(mailOptions);
-    return res.status(201).json({ msg: "Auction warning", result: result });
+    return res
+      .status(HTTP_STATUS_CODES.CREATED)
+      .json({ msg: "Auction warning", result: result });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: "Internal server error" });
+    logger.log(error);
+    // console.log(error);
+    return res
+      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Internal server error" });
   }
 }
 

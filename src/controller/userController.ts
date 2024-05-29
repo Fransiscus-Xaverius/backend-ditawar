@@ -12,20 +12,20 @@ async function login(req: Request, res: Response) {
     try {
         const { email, password } = req.query;
         if (!email || !password) {
-            return res.status(400).json({ msg: "Please enter all fields" });
+            return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ msg: "Please enter all fields" });
         }
         await client.connect();
         const user = await client.db("dbDitawar").collection("users").findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ msg: "Invalid credentials" });
+            return res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ msg: "Invalid credentials" });
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(404).json({ msg: "Invalid credentials" });
+            return res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ msg: "Invalid credentials" });
         }
         const privateKey = ENV.PRIVATE_KEY;
         var token = jwt.sign({ user: user }, privateKey, { expiresIn: '30d' });
-        return res.status(200).json({
+        return res.status(HTTP_STATUS_CODES.SUCCESS).json({
             msg: "Login successful", token: token, user: {
                 nama: user.nama,
                 email: user.email,
@@ -39,7 +39,7 @@ async function login(req: Request, res: Response) {
         });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -50,7 +50,7 @@ async function Reload(req: Request, res: Response) {
     const user = await client.db("dbDitawar").collection("users").findOne({ _id: o_id });
     const privateKey = ENV.PRIVATE_KEY;
     var token = jwt.sign({ user: user }, privateKey, { expiresIn: '30d' });
-    return res.status(200).json({
+    return res.status(HTTP_STATUS_CODES.SUCCESS).json({
         msg: "Login successful", token: token, user: {
             nama: user.nama,
             email: user.email,
@@ -78,7 +78,7 @@ async function reloadUser(req: Request, res: Response) {
         const result = await client.db("dbDitawar").collection("users").findOne({ _id: new ObjectId(user._id) });
         console.log("PP:", result.profile_picture)
         var newToken = jwt.sign({ user: user }, cert, { expiresIn: '30d' });
-        return res.status(200).json({
+        return res.status(HTTP_STATUS_CODES.SUCCESS).json({
             msg: "Login successful", token: newToken, user: {
                 nama: result.nama,
                 email: result.email,
@@ -91,7 +91,7 @@ async function reloadUser(req: Request, res: Response) {
         });
     } catch (err) {
         console.log(err);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -99,7 +99,7 @@ async function allUser(req: Request, res: Response) {
     await client.connect();
     const result = await client.db("dbDitawar").collection("users").find().toArray();
     console.log(result);
-    return res.status(200).send({ result: result, message: "Berhasil" });
+    return res.status(HTTP_STATUS_CODES.SUCCESS).send({ result: result, message: "Berhasil" });
 }
 
 async function getDataFromToken(req: Request, res: Response) {
@@ -111,7 +111,7 @@ async function getDataFromToken(req: Request, res: Response) {
         }
         else {
             console.log("USERDATA:", payload);
-            return res.status(200).json({ msg: "Authorized", payload: payload });
+            return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "Authorized", payload: payload });
         }
     });
 }
@@ -120,7 +120,7 @@ async function register(req: Request, res: Response) {
     try {
         const { password, phone, email, city, name, province, address } = req.query;
         if (!email || !password) {
-            return res.status(400).json({ msg: "Please enter all fields" });
+            return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ msg: "Please enter all fields" });
         }
         await client.connect();
         const existingUser = await client.db("dbDitawar").collection("users").findOne({ email: email });
@@ -147,11 +147,11 @@ async function register(req: Request, res: Response) {
         const result = await client.db("dbDitawar").collection("users").insertOne(newUser);
         const user = await client.db("dbDitawar").collection("users").findOne({ email: email });
         const wallet = await newWallet(user._id, 0);
-        return res.status(200).json({ msg: "User created successfully", result: result });
+        return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "User created successfully", result: result });
 
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -171,10 +171,10 @@ async function getUserById(req: Request, res: Response) {
             _id: result._id,
             role: result.role
         }
-        return res.status(201).json({ msg: "User Found", result: userObj });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "User Found", result: userObj });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -208,9 +208,9 @@ async function verification(req: Request, res: Response) {
             };
             await transporter.sendMail(mailOptions)
         }
-        return res.status(201).json({ msg: "User Verified" });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "User Verified" });
     } catch (error) {
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -256,9 +256,9 @@ async function banned(req: Request, res: Response) {
 
             await transporter.sendMail(mailOptions)
         }
-        return res.status(201).json({ msg: "User Update" });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "User Update" });
     } catch (error) {
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -292,9 +292,9 @@ async function updateUserById(req: Request, res: Response) {
                 }
             });
         }
-        return res.status(201).json({ msg: "User Updated" });
+        return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "User Updated" });
     } catch (error) {
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 

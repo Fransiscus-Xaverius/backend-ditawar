@@ -6,6 +6,7 @@ import path from 'path';
 import { AuctionUpdate } from './src/controller/auctionController';
 import { BidUpdate } from './src/controller/bidController';
 import ENV from './src/config/environments';
+import { logger } from './src/services/logger.service';
 
 dotenv.config();
 
@@ -22,5 +23,6 @@ setInterval(function () {
 }, 1000);
 
 app.listen(port, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+    logger.log(`⚡️[server]: Server is running at http://localhost:${port}`)
+    // console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });

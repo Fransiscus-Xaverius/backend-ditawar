@@ -1,9 +1,12 @@
-export const ERROR_MESSAGES = {
-
-}
+export const ERROR_MESSAGES = {};
 export const SERVER_RESPONSE_MESSAGES = {
-    UNAUTHORIZED: "Unauthorized"
-}
+  UNAUTHORIZED: "Unauthorized",
+};
 export const HTTP_STATUS_CODES = {
-    UNAUTHORIZED: 401
-}
+  UNAUTHORIZED: 401,
+  CREATED: 201,
+  INTERNAL_SERVER_ERROR: 500,
+  SUCCESS: 200,
+  NOT_FOUND: 404,
+  BAD_REQUEST: 400,
+};

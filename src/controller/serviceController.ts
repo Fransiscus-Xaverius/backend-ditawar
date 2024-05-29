@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import client from "../database/database";
 import { ObjectId } from "mongodb";
+import { HTTP_STATUS_CODES } from "../config/messages";
 
 // POST /feedback
 async function createService(req: Request, res: Response) {
@@ -15,9 +16,9 @@ async function createService(req: Request, res: Response) {
 			msg : req.body.msg,
 		});
 
-        return res.status(201).json({message: "success"});
+        return res.status(HTTP_STATUS_CODES.CREATED).json({message: "success"});
 	} catch (error) {
-		return res.status(500).json({ message: "Internal server error" });
+		return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
 	}
 }
 
@@ -25,9 +26,9 @@ async function getAllService(req: Request, res: Response) {
     try {
         await client.connect();
         const result = await client.db("dbDitawar").collection("services").find({}).toArray();
-        return res.status(200).json({ message: "success", result: result });
+        return res.status(HTTP_STATUS_CODES.SUCCESS).json({ message: "success", result: result });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
     
 }
@@ -39,9 +40,9 @@ async function getServiceByIdAuction(req: Request, res: Response) {
         const { id } = req.query;
         const o_id = new ObjectId(id?.toString() ?? "");
         const result = await client.db("dbDitawar").collection("services").findOne({ id_auction: o_id });
-        return res.status(200).json({ message: "success", result: result });
+        return res.status(HTTP_STATUS_CODES.SUCCESS).json({ message: "success", result: result });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
 }
 

@@ -9,10 +9,10 @@ async function getTransaction(req: Request, res: Response) {
     ;
     const { id, token } = req.query;
     if (!id) {
-        return res.status(400).json({ msg: "Bad request (No id)" });
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ msg: "Bad request (No id)" });
     }
     if (!token) {
-        return res.status(400).json({ msg: "Bad request (No token)" });
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ msg: "Bad request (No token)" });
     }
     try {
         //cek token
@@ -28,16 +28,16 @@ async function getTransaction(req: Request, res: Response) {
             await client.connect();
             const result = await client.db("dbDitawar").collection("transactions").findOne({ _id: new ObjectId(id.toString()) });
             if (!result) {
-                return res.status(404).json({ msg: "Transaction not found" });
+                return res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ msg: "Transaction not found" });
             }
-            return res.status(201).json({ msg: "Transaction Found", result: result });
+            return res.status(HTTP_STATUS_CODES.CREATED).json({ msg: "Transaction Found", result: result });
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ msg: "Internal server error" });
+            return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ msg: "Internal server error" });
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({ msg: "Internal server error" });
     }
 }
 
@@ -109,7 +109,7 @@ async function getTransactionbyId(req: Request, res: Response) {
     await client.connect();
     const o_id = new ObjectId(id?.toString() ?? '');
     const result = await client.db("dbDitawar").collection("transactions").findOne({ _id: new ObjectId(o_id) });
-    return res.status(200).json({ msg: "Transaction Found", result: result });
+    return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "Transaction Found", result: result });
 }
 
 async function getAllTransactionTopup(req: Request, res: Response) {
@@ -117,21 +117,21 @@ async function getAllTransactionTopup(req: Request, res: Response) {
     await client.connect();
     const o_id = new ObjectId(id?.toString() ?? '');
     const result = await client.db("dbDitawar").collection("transactions").find({ wallet_id: new ObjectId(o_id), type: "topup", "invoice.status": "SETTLED" }).toArray();
-    return res.status(200).json({ msg: "Topup Found", result: result });
+    return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "Topup Found", result: result });
 }
 async function getAllTransactionSale(req: Request, res: Response) {
     const { id } = req.query;
     await client.connect();
     const o_id = new ObjectId(id?.toString() ?? '');
     const result = await client.db("dbDitawar").collection("transactions").find({ wallet_id: new ObjectId(o_id), type: "sale" }).toArray();
-    return res.status(200).json({ msg: "Topup Found", result: result });
+    return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "Topup Found", result: result });
 }
 async function getAllTransactionPurchase(req: Request, res: Response) {
     const { id } = req.query;
     await client.connect();
     const o_id = new ObjectId(id?.toString() ?? '');
     const result = await client.db("dbDitawar").collection("transactions").find({ wallet_id: new ObjectId(o_id), type: "purchase" }).toArray();
-    return res.status(200).json({ msg: "Topup Found", result: result });
+    return res.status(HTTP_STATUS_CODES.SUCCESS).json({ msg: "Topup Found", result: result });
 }
 
 

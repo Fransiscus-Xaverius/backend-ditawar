@@ -38,10 +38,10 @@ async function uploadFile(req: Request, res: Response) {
         upload(req, res, function (err) {
             if (err){
               console.log(JSON.stringify(err));
-              res.status(400).send('fail saving image');
+              res.status(HTTP_STATUS_CODES.BAD_REQUEST).send('fail saving image');
             } else {
               console.log('The filename is ' + res?.req?.file?.filename);
-              res.status(200).json({filename:res?.req?.file?.filename});  
+              res.status(HTTP_STATUS_CODES.SUCCESS).json({filename:res?.req?.file?.filename});  
             }
         });
     } catch (error) {
@@ -58,7 +58,7 @@ function getImage(req:Request, res:Response):any {
             res.sendFile(imagePath);
         } else {
             console.log("Image not found at path: ", imagePath); // Log the path where the image was not found
-            res.status(404).json({msg: "Image not found"});
+            res.status(HTTP_STATUS_CODES.NOT_FOUND).json({msg: "Image not found"});
         }
    } catch (error) {
         console.error(error);
@@ -85,10 +85,10 @@ async function addItem(req:Request, res:Response){
     try {
         await client.connect();
         const result = await client.db("dbDitawar").collection("items").insertOne(newItem);
-        return res.status(201).json({msg: "Item added", result:result});
+        return res.status(HTTP_STATUS_CODES.CREATED).json({msg: "Item added", result:result});
     } catch (error) {
         console.error(error);
-        return res.status(500).json({msg: "Internal server error"});
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({msg: "Internal server error"});
     }
 }
 
@@ -120,10 +120,10 @@ async function editItem(req:Request, res:Response){
                 },
                 }
             );
-        return res.status(201).json({msg: "Item updated", result:result});
+        return res.status(HTTP_STATUS_CODES.CREATED).json({msg: "Item updated", result:result});
     } catch (error) {
         console.error(error);
-        return res.status(500).json({msg: "Internal server error"});
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({msg: "Internal server error"});
     }
 }
 
@@ -139,10 +139,10 @@ async function getItem(req:Request, res:Response){
         const result = await client.db("dbDitawar").collection("items").findOne({_id: o_id});
         // console.log(result);
         result.images = result.images;
-        return res.status(201).json({msg: "Item Found", result:result});
+        return res.status(HTTP_STATUS_CODES.CREATED).json({msg: "Item Found", result:result});
     } catch (error) {
         console.error(error);
-        return res.status(500).json({msg: "Internal server error"});
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({msg: "Internal server error"});
     }
 }
 

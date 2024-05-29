@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 import { ObjectId } from "mongodb";
 import { trusted } from "mongoose";
 import ENV from "../config/environments";
+import { HTTP_STATUS_CODES } from "../config/messages";
 const authToken = Buffer.from(`${ENV.XENDIT_AUTH_TOKEN}:`).toString("base64");
 
 async function createInvoice(req: Request, res: Response) {
@@ -91,10 +92,10 @@ async function createInvoice(req: Request, res: Response) {
                     const wallet = await client.db("dbDitawar").collection("wallets").updateOne({ _id: new ObjectId(wallet_id) }, { $push: { history: newHistory } });
                     console.log(wallet);
                 } catch (error) {
-                    return res.status(500).send("Internal Server Error");
+                    return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send("Internal Server Error");
                 }
             } catch (error) {
-                return res.status(500).send("Internal Server Error");
+                return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send("Internal Server Error");
             }
         }
         else {
@@ -104,7 +105,7 @@ async function createInvoice(req: Request, res: Response) {
         return res.status(status).send(data);
     } catch (err) {
         console.log(err)
-        return res.status(400).send(err);
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).send(err);
     }
 };
 
@@ -123,7 +124,7 @@ const ExpireInvoice = async (req: Request, res: Response) => {
         );
         return res.status(status).send(data);
     } catch (err) {
-        return res.status(400).send(err);
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).send(err);
     }
 };
 
@@ -181,7 +182,7 @@ const GetInvoicebyInvoice_id = async (req: Request, res: Response) => {
         );
         return res.status(status).send(data);
     } catch (err) {
-        return res.status(400).send(err);
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).send(err);
     }
 };
 
@@ -199,7 +200,7 @@ const GetInvoicebyExternal_id = async (req: Request, res: Response) => {
         );
         return res.status(status).send(data);
     } catch (err) {
-        return res.status(400).send(err);
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).send(err);
     }
 };
 
@@ -217,7 +218,7 @@ const GetAllInvoice = async (req: Request, res: Response) => {
         );
         return res.status(status).send(data);
     } catch (err) {
-        return res.status(400).send(err);
+        return res.status(HTTP_STATUS_CODES.BAD_REQUEST).send(err);
     }
 };
 
@@ -225,9 +226,9 @@ const GetAllTransactions = async (req: Request, res: Response) => {
     try {
         await client.connect();
         const transactions = await client.db("dbDitawar").collection("transactions").find().toArray();
-        return res.status(200).send(transactions);
+        return res.status(HTTP_STATUS_CODES.SUCCESS).send(transactions);
     } catch (error) {
-        return res.status(500).send("Internal Server Error");
+        return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };
 
