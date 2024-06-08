@@ -1,0 +1,1 @@
+const DATABASE_NAME = "dbDitawar"

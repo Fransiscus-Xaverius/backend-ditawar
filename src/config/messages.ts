@@ -1,6 +1,7 @@
 export const ERROR_MESSAGES = {};
 export const SERVER_RESPONSE_MESSAGES = {
   UNAUTHORIZED: "Unauthorized",
+  INTERNAL_SERVER_ERROR: "Internal server error",
 };
 export const HTTP_STATUS_CODES = {
   UNAUTHORIZED: 401,

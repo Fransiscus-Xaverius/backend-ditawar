@@ -9,6 +9,7 @@ import {
   SERVER_RESPONSE_MESSAGES,
 } from "../config/messages";
 import { logger } from "../services/logger.service";
+import { AuctionDao } from "../contracts/dao/auction.dao";
 const nodemailer = require("nodemailer");
 
 async function addAuction(req: Request, res: Response) {
@@ -39,7 +40,7 @@ async function addAuction(req: Request, res: Response) {
     // console.log(tanggal_selesai);
     logger.log(new Date(tanggal_selesai + " " + jam_selesai));
     // console.log(new Date(tanggal_selesai + " " + jam_selesai));
-    const newAuction: AuctionDto = {
+    const auction = new AuctionDao({
       id_user: user._id,
       nama_penjual: user.nama,
       id_barang: id_barang,
@@ -54,12 +55,8 @@ async function addAuction(req: Request, res: Response) {
       highest_bid: null,
       ended: false,
       bid_count: 0,
-    };
-    await client.connect();
-    const result = await client
-      .db("dbDitawar")
-      .collection("auctions")
-      .insertOne(newAuction);
+    } as AuctionDto);
+    const result = await auction.addAuction();
     if (result) {
       return res
         .status(HTTP_STATUS_CODES.CREATED)
@@ -67,23 +64,18 @@ async function addAuction(req: Request, res: Response) {
     }
     return res
       .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error" });
+      .json({ msg: SERVER_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR });
   } catch (error) {
-    // console.log(error);
     return res
       .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error" });
+      .json({ msg: SERVER_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR });
   }
 }
 
 async function AuctionUpdate() {
   try {
     await client.connect();
-    const result = await client
-      .db("dbDitawar")
-      .collection("auctions")
-      .find({ ended: false })
-      .toArray();
+    const result = await AuctionDao.getOngoingAuctions();
     const now = new Date();
     for (let i = 0; i < result.length; i++) {
       const auction = result[i];
@@ -91,6 +83,9 @@ async function AuctionUpdate() {
       if (now > end) {
         logger.log("Found auction to end");
         // console.log("Found auction to end");
+        if(auction._id){
+          await AuctionDao.endAuction(auction._id);
+        }
         await client
           .db("dbDitawar")
           .collection("auctions")
@@ -98,87 +93,89 @@ async function AuctionUpdate() {
             { _id: new ObjectId(auction._id) },
             { $set: { ended: true } }
           );
-        const highestBid = await client
-          .db("dbDitawar")
-          .collection("bids")
-          .findOne({ _id: new ObjectId(auction.highest_bid) });
-        if (highestBid) {
-          const item = await client
+        if (auction.highest_bid) {
+          const highestBid = await client
             .db("dbDitawar")
-            .collection("items")
-            .findOne({ _id: new ObjectId(auction.id_barang) });
-          if (item) {
-            const seller = await client
+            .collection("bids")
+            .findOne({ _id: new ObjectId(auction.highest_bid) });
+          if (highestBid) {
+            const item = await client
               .db("dbDitawar")
-              .collection("users")
-              .findOne({ _id: new ObjectId(auction.id_user) });
-            const buyer = await client
-              .db("dbDitawar")
-              .collection("users")
-              .findOne({ _id: new ObjectId(highestBid.id_user) });
-            if (buyer) {
-              const wallet = await client
+              .collection("items")
+              .findOne({ _id: new ObjectId(auction.id_barang) });
+            if (item) {
+              const seller = await client
                 .db("dbDitawar")
-                .collection("wallets")
-                .findOne({ id_user: new ObjectId(seller._id) });
-              if (wallet) {
-                const saldo = wallet.saldo;
-                const saldo_tertahan = wallet.saldo_tertahan;
-                const history = wallet.history;
-                const newTransaction = {
-                  id_auction: auction._id,
-                  id_item: item._id,
-                  buyer: buyer._id,
-                  seller: seller._id,
-                  type: "auction",
-                  invoice: {
-                    amount: highestBid.bid,
-                    date: new Date(),
-                    status: "pending",
-                    description:
-                      "Pembayaran untuk barang " +
-                      item.nama +
-                      " dengan harga " +
-                      highestBid.bid,
-                  },
-                };
-                const transaction = await client
-                  .db("dbDitawar")
-                  .collection("transactions")
-                  .insertOne(newTransaction);
-
-                history.push(transaction.insertedId);
-                const update = await client
+                .collection("users")
+                .findOne({ _id: new ObjectId(auction.id_user) });
+              const buyer = await client
+                .db("dbDitawar")
+                .collection("users")
+                .findOne({ _id: new ObjectId(highestBid.id_user) });
+              if (buyer) {
+                const wallet = await client
                   .db("dbDitawar")
                   .collection("wallets")
-                  .updateOne(
-                    { id_user: new ObjectId(seller._id) },
-                    {
-                      $set: {
-                        saldo: saldo,
-                        saldo_tertahan:
-                          parseInt(saldo_tertahan) + parseInt(highestBid.bid),
-                        history: history,
-                      },
-                    }
-                  );
-                logger.log(update);
-                // console.log(update);
+                  .findOne({ id_user: new ObjectId(seller._id) });
+                if (wallet) {
+                  const saldo = wallet.saldo;
+                  const saldo_tertahan = wallet.saldo_tertahan;
+                  const history = wallet.history;
+                  const newTransaction = {
+                    id_auction: auction._id,
+                    id_item: item._id,
+                    buyer: buyer._id,
+                    seller: seller._id,
+                    type: "auction",
+                    invoice: {
+                      amount: highestBid.bid,
+                      date: new Date(),
+                      status: "pending",
+                      description:
+                        "Pembayaran untuk barang " +
+                        item.nama +
+                        " dengan harga " +
+                        highestBid.bid,
+                    },
+                  };
+                  const transaction = await client
+                    .db("dbDitawar")
+                    .collection("transactions")
+                    .insertOne(newTransaction);
 
-                const newPurchase = {
-                  buyer: buyer._id,
-                  seller: seller._id,
-                  item: item._id,
-                  auction: auction._id,
-                  transaction: transaction.insertedId,
-                  status: "pending",
-                  history: [],
-                };
+                  history.push(transaction.insertedId);
+                  const update = await client
+                    .db("dbDitawar")
+                    .collection("wallets")
+                    .updateOne(
+                      { id_user: new ObjectId(seller._id) },
+                      {
+                        $set: {
+                          saldo: saldo,
+                          saldo_tertahan:
+                            parseInt(saldo_tertahan) + parseInt(highestBid.bid),
+                          history: history,
+                        },
+                      }
+                    );
+                  logger.log(update);
+                  // console.log(update);
 
-                const purchase = await client
-                  .db("dbDitawar")
-                  .collection("purchases")
-                  .insertOne(newPurchase);
+                  const newPurchase = {
+                    buyer: buyer._id,
+                    seller: seller._id,
+                    item: item._id,
+                    auction: auction._id,
+                    transaction: transaction.insertedId,
+                    status: "pending",
+                    history: [],
+                  };
+
+                  const purchase = await client
+                    .db("dbDitawar")
+                    .collection("purchases")
+                    .insertOne(newPurchase);
+                }
               }
             }
           }
